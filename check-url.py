@@ -1,6 +1,7 @@
 #!/usr/bin/python
 
 import os
+from os import environ
 import sys
 import re
 import fileinput
@@ -11,7 +12,9 @@ import json
 
 #filesource = "sources/list.txt"
 
-filesource = os.environ['LIST'] 
+filesource = os.environ['LIST']
+if environ.get('DELAY') is not None:
+  delay = os.environ['DELAY']
 
 
 def main():
@@ -32,7 +35,10 @@ def main():
       danger = url[3]
     time.sleep(2)
     format_response(url, danger, warning)
-  time.sleep(30)
+  if environ.get('DELAY') is not None:
+    time.sleep(float(delay))
+  else:
+    time.sleep(30)
 
 
 def format_response(url, danger, warning):
@@ -114,7 +120,7 @@ def checkurl(url):
     return None, None, end
   return req, timereq, end
 
-  
+
 
 if __name__ == '__main__':
   while True:

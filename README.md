@@ -38,7 +38,9 @@ https://www.impots.gouv.fr/portail/ mention-legales
 ```
 
 ## Exécution
+La variable d'environnement "DELAY" est optionelle, par défaut elle sera d'une valeur de 30 secondes
 ```
+export DELAY=<DELAI_ENTRE_TESTS>
 export LIST=${PWD}/list.txt
 python check-url.py
 ```
