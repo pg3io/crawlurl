@@ -61,7 +61,7 @@ docker stack deploy <NOM_STACK> -c docker-compose.yml
 - [x] Creation d'une variable "return" (on sait plus ce qu'elle fait)
 - [x] Source url/mot file txt
 - [ ] Source url/mot db (mariadb)
-- [ ] Variabiliser la tempo entre chaque lot de test
+- [x] Variabiliser la tempo entre chaque lot de test
 - [ ] Ajout d'informations dans le log json (taille de la page ...)
 
 # License
