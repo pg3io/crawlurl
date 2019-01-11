@@ -10,145 +10,167 @@ import time
 import ssl
 import json
 from threading import Thread
+import Queue
 
 filesource = os.environ['LIST']
+if environ.get('THREAD') is not None:
+    nbr_thread = os.environ['THREAD']
 if environ.get('DELAY') is not None:
-  delay = os.environ['DELAY']
+    delay = os.environ['DELAY']
 
 url_data = []
 
 def main():
-  global url_data
-  threads = []
-  file = open_file()
-  urls = get_url_array(file)
+    global url_data
+    file = open_file()
+    urls = get_url_array(file)
+    q = Queue.Queue(maxsize=0)
 
-  while True:
-    i = 0
-    for url in urls:
-      process = Thread(target=checkurl, args=[url])
-      process.start()
-      threads.append(process)
-      for process in threads:
-        process.join()
-
-    for line in file:
-      link = line.split(" ")
-      try:
-        link[2]
-      except:
-        warning = 0.1
-      else:
-        warning = link[2]
-      try:
-        link[3]
-      except:
-        danger = 0.2
-      else:
-        danger = link[3]
-      format_response(urls[i], url_data[i][0], url_data[i][1], warning, danger, link[1])
-      i += 1
-
-    url_data = []
-    if environ.get('DELAY') is not None:
-      time.sleep(float(delay))
+    if environ.get('THREAD') is not None:
+        for i in range(int(nbr_thread)):
+            t = Thread(target=checkurl, args=(q,))
+            t.daemon = True
+            t.start()
     else:
-      time.sleep(30)
+        for i in range(int(2)):
+            t = Thread(target=checkurl, args=(q,))
+            t.daemon = True
+            t.start()
+
+    while True:
+        i = 0
+        for url in urls:
+            q.put(url)
+        q.join()
+
+        fill_limit_data(file)
+        for data in url_data:
+            try:
+                data[4]
+            except:
+                warning = 0.1
+            else:
+                warning = data[4]
+            try:
+                data[5]
+            except:
+                danger = 0.2
+            else:
+                danger = data[5]
+            format_response(urls[i], url_data[i][0], url_data[i][1], warning, danger, data[6])
+            i += 1
+
+        url_data = []
+        if environ.get('DELAY') is not None:
+            time.sleep(float(delay))
+        else:
+            time.sleep(30)
+
+
+def fill_limit_data(file):
+    for line in file:
+        split_line = line.split(" ")
+        for data in url_data:
+            if split_line[0] == data[3]:
+                data.append(split_line[2])
+                data.append(split_line[3])
+                data.append(split_line[1])
+
 
 
 def get_url_array(file):
-  urls = []
+    urls = []
 
-  for line in file:
-    urls.append(line.partition(' ')[0])
+    for line in file:
+        urls.append(line.partition(' ')[0])
 
-  return urls
+    return urls
+
 
 def format_response(url, req, timereq, warning, danger, result):
-  retry = 0
-  if req != None:
-    timenow = time.strftime("%d/%m/%Y %H:%M:%S")
-    retcode = req.getcode()
-    html = req.read()
-    result = html.count(result)
-    if timereq > danger or retry > 0:
-      etat = "danger"
-      status_code = 1
-      message = "retry_or_%s_second_time_out" % danger
-    elif result <= 0:
-      etat = "danger"
-      status_code = 1
-      message = "no_word_in_page"
-    elif timereq > warning:
-      etat = "warning"
-      status_code = 2
-      message = "%s_second_time_out" % warning
+    retry = 0
+    if req != None:
+        timenow = time.strftime("%d/%m/%Y %H:%M:%S")
+        retcode = req.getcode()
+        html = req.read()
+        result = html.count(result)
+        if timereq > danger or retry > 0:
+            etat = "danger"
+            status_code = 1
+            message = "retry_or_%s_second_time_out" % danger
+        elif result <= 0:
+            etat = "danger"
+            status_code = 1
+            message = "no_word_in_page"
+        elif timereq > warning:
+            etat = "warning"
+            status_code = 2
+            message = "%s_second_time_out" % warning
+        else:
+            etat = "success"
+            status_code = 0
+            message = "ok"
     else:
-      etat = "success"
-      status_code = 0
-      message = "ok"
-  else:
-    etat = "danger"
-    status_code = 1
-    message = "ERROR"
-    retcode = "000"
-    timereq = float(0.00)
-    result = "0"
-  format_to_json(status_code, etat, timereq, url, retcode, result, message)
-  temp.close()
+        etat = "danger"
+        status_code = 1
+        message = "ERROR"
+        retcode = "000"
+        timereq = float(0.00)
+        result = "0"
+    format_to_json(status_code, etat, timereq, url, retcode, result, message)
+    temp.close()
 
 
 def open_file():
-  global temp
-  temp = open("%s" % filesource ,"r")
-  file = temp.read().splitlines()
-  temp.close()
+    global temp
+    temp = open("%s" % filesource ,"r")
+    file = temp.read().splitlines()
+    temp.close()
 
-  return file
+    return file
 
 
 def format_to_json(status_code, etat, timereq, url, retcode, result, message):
     data = {}
 
     data['status_code'] = status_code
-    data['timereq'] = timereq 
+    data['timereq'] = timereq
     data['url'] = url
-    data['retcode'] = retcode 
-    data['result'] = result 
+    data['retcode'] = retcode
+    data['result'] = result
     data['message'] = message
     data_json = json.dumps(data)
 
     print(data_json)
 
 
-def checkurl(url):
-  try:
-    start = time.time()
-    req = urllib2.urlopen(url, timeout = 1)
-    end = time.time()
-    timereq = end - start
-  except urllib2.HTTPError, e:
-    #print("HTTPError ... url: %s code %s" % (url,e.code))
-    end = time.time()
-    return None, None, end 
-  except urllib2.URLError, e:
-    end = time.time()
-    #print("URLError ... url: %s" % (url))
-    return None, None, end
-  except ssl.SSLError, e:
-    #print("SSLError ... url: %s" % (url))
-    end = time.time()
-    return None, None, end
+def checkurl(q):
 
-  url_data.append([req, timereq, end])
+    while True:
+        url = q.get()
+        try:
+            start = time.time()
+            req = urllib2.urlopen(url, timeout = 1)
+            end = time.time()
+            timereq = end - start
+        except urllib2.HTTPError, e:
+            end = time.time()
+            return None, None, end
+        except urllib2.URLError, e:
+            end = time.time()
+            return None, None, end
+        except ssl.SSLError, e:
+            end = time.time()
+            return None, None, end
 
-  return req, timereq, end
+        url_data.append([req, timereq, end, url])
+        q.task_done()
 
 
 
 if __name__ == '__main__':
-  while True:
-    try:
-      main()
-    except KeyboardInterrupt:
-      exit(1)
+    while True:
+        try:
+            main()
+        except KeyboardInterrupt:
+            exit(1)

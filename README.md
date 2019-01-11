@@ -38,10 +38,12 @@ https://www.impots.gouv.fr/portail/ mention-legales
 ```
 
 ## Exécution
-La variable d'environnement "DELAY" est optionelle, par défaut elle sera d'une valeur de 30 secondes
+* La variable d'environnement "DELAY" est optionelle, par défaut elle sera d'une valeur de 30 secondes
+* La variable d'environnement "THREAD" est optionelle, par défaut elle sera d'une valeur de 2
 ```
 export DELAY=<DELAI_ENTRE_TESTS>
-export LIST=${PWD}/sources/list.txt
+export THREAD=<NOMBRE_THREAD_MAX>
+export LIST=${PWD}/list.txt
 python check-url.py
 ```
 
@@ -60,8 +62,10 @@ docker stack deploy <NOM_STACK> -c docker-compose.yml
 - [x] Code fonctionnel (mais pas très optimisé ...)
 - [x] Creation d'une variable "return" (on sait plus ce qu'elle fait)
 - [x] Source url/mot file txt
-- [ ] Source url/mot db (mariadb)
 - [x] Variabiliser la tempo entre chaque lot de test
+- [x] Multithread des requêtes
+- [x] Variabiliser le nombre de Thread
+- [ ] Source url/mot db (mariadb)
 - [ ] Ajout d'informations dans le log json (taille de la page ...)
 
 # License
