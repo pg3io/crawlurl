@@ -38,27 +38,13 @@ def main():
             t.start()
 
     while True:
-        i = 0
         for url in urls:
             q.put(url)
         q.join()
 
         fill_limit_data(file)
         for data in url_data:
-            try:
-                data[4]
-            except:
-                warning = 0.1
-            else:
-                warning = data[4]
-            try:
-                data[5]
-            except:
-                danger = 0.2
-            else:
-                danger = data[5]
-            format_response(urls[i], url_data[i][0], url_data[i][1], warning, danger, data[6])
-            i += 1
+            format_response(data[3], data[0], data[1], data[5], data[6], data[4])
 
         url_data = []
         if environ.get('DELAY') is not None:
@@ -72,10 +58,19 @@ def fill_limit_data(file):
         split_line = line.split(" ")
         for data in url_data:
             if split_line[0] == data[3]:
-                data.append(split_line[2])
-                data.append(split_line[3])
                 data.append(split_line[1])
-
+                try:
+                    split_line[2]
+                except:
+                    data.append(0.1)
+                else:
+                    data.append(float(split_line[2]))
+                try:
+                    split_line[3]
+                except:
+                    data.append(0.2)
+                else:
+                    data.append(float(split_line[3]))
 
 
 def get_url_array(file):
@@ -96,15 +91,15 @@ def format_response(url, req, timereq, warning, danger, result):
         result = html.count(result)
         if timereq > danger or retry > 0:
             etat = "danger"
-            status_code = 1
+            status_code = 2
             message = "retry_or_%s_second_time_out" % danger
         elif result <= 0:
             etat = "danger"
-            status_code = 1
+            status_code = 2
             message = "no_word_in_page"
         elif timereq > warning:
             etat = "warning"
-            status_code = 2
+            status_code = 1
             message = "%s_second_time_out" % warning
         else:
             etat = "success"
@@ -112,7 +107,7 @@ def format_response(url, req, timereq, warning, danger, result):
             message = "ok"
     else:
         etat = "danger"
-        status_code = 1
+        status_code = 2
         message = "ERROR"
         retcode = "000"
         timereq = float(0.00)
