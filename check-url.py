@@ -147,18 +147,32 @@ def checkurl(q):
             req = urllib2.urlopen(url, timeout = 1)
             end = time.time()
             timereq = end - start
+
+            url_data.append([req, timereq, end, url])
+            q.task_done()
         except urllib2.HTTPError, e:
             end = time.time()
+            timereq = end - start
+
+            url_data.append([e, timereq, end, url])
+            q.task_done()
             return None, None, end
         except urllib2.URLError, e:
             end = time.time()
+            timereq = end - start
+
+            url_data.append([e, timereq, end, url])
+            q.task_done()
             return None, None, end
         except ssl.SSLError, e:
             end = time.time()
+            timereq = end - start
+
+            url_data.append([e, timereq, end, url])
+            q.task_done()
             return None, None, end
 
-        url_data.append([req, timereq, end, url])
-        q.task_done()
+
 
 
 
