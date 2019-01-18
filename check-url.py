@@ -62,15 +62,15 @@ def fill_limit_data(file):
                 try:
                     split_line[2]
                 except:
-                    data.append(0.1)
+                    data.append(0.2)
                 else:
-                    data.append(float(split_line[2]))
+                    data.append(split_line[2])
                 try:
                     split_line[3]
                 except:
-                    data.append(0.2)
+                    data.append(0.3)
                 else:
-                    data.append(float(split_line[3]))
+                    data.append(split_line[3])
 
 
 def get_url_array(file):
@@ -132,7 +132,6 @@ def format_to_json(status_code, etat, timereq, url, retcode, result, message):
     data['timereq'] = timereq
     data['url'] = url
     data['retcode'] = retcode
-    data['result'] = result
     data['message'] = message
     data_json = json.dumps(data)
 
