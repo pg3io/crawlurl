@@ -22,8 +22,8 @@ Le "status_code" peut prendre différentes valeurs :
 
 Exemple
 ```
-{"retcode": 200, "url": "https://www.theverge.com", "status_code": 0, "result": 1, "timereq": 0.023188114166259766, "message": "ok"}
-{"retcode": 200, "url": "https://www.impots.gouv.fr/portail/", "status_code": 0, "result": 1, "timereq": 0.012618064880371094, "message": "ok"}
+{"retcode": 200, "url": "https://www.theverge.com", "status_code": 0, "timereq": 0.023188114166259766, "message": "ok"}
+{"retcode": 200, "url": "https://www.impots.gouv.fr/portail/", "status_code": 0, "timereq": 0.012618064880371094, "message": "ok"}
 ```
 
 ### Synthaxe txt
