@@ -17,8 +17,8 @@ logging "stdout" format "Json"
 ```
 Le "status_code" peut prendre différentes valeurs :
 * 0 = Success
-* 1 = Critical, timeout et 404
-* 2 = Warning, temps de réponse trop long
+* 1 = Warning, temps de réponse trop long
+* 2 = Critical, timeout et 404
 
 Exemple
 ```
