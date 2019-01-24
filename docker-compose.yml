@@ -2,7 +2,7 @@ version: '3.3'
 
 services:
   web:
-    image: registry.pg3.io:5000/monit/crawl:0.1
+    image: registry.pg3.io:5000/pg3io/crawl:0.7.2
     volumes:
       - ${PWD}/sources/:/sources/
     environment:
