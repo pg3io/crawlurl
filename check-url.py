@@ -2,9 +2,6 @@
 
 import os
 from os import environ
-import sys
-import re
-import fileinput
 import urllib2
 import time
 import ssl
@@ -22,8 +19,6 @@ url_data = []
 
 def main():
     global url_data
-    file = open_file()
-    urls = get_url_array(file)
     q = Queue.Queue(maxsize=0)
 
     if environ.get('THREAD') is not None:
@@ -32,14 +27,17 @@ def main():
             t.daemon = True
             t.start()
     else:
-        for i in range(int(2)):
+        for i in range(int(1)):
             t = Thread(target=checkurl, args=(q,))
             t.daemon = True
             t.start()
 
     while True:
+        file = open_file()
+        urls = get_url_array(file)
         for url in urls:
-            q.put(url)
+            if url[0] != "#":
+                q.put(url)
         q.join()
 
         fill_limit_data(file)
@@ -112,7 +110,7 @@ def format_response(url, req, timereq, warning, danger, result):
         retcode = "000"
         timereq = float(0.00)
         result = "0"
-    format_to_json(status_code, etat, timereq, url, retcode, result, message)
+    format_to_json(status_code, timereq, url, retcode, message)
     temp.close()
 
 
@@ -125,7 +123,7 @@ def open_file():
     return file
 
 
-def format_to_json(status_code, etat, timereq, url, retcode, result, message):
+def format_to_json(status_code, timereq, url, retcode, message):
     data = {}
 
     data['status_code'] = status_code
@@ -139,15 +137,13 @@ def format_to_json(status_code, etat, timereq, url, retcode, result, message):
 
 
 def checkurl(q):
-
-    while True:
+    while(True):
         url = q.get()
         try:
             start = time.time()
-            req = urllib2.urlopen(url, timeout = 1)
+            req = urllib2.urlopen(url, timeout = 2)
             end = time.time()
             timereq = end - start
-
             url_data.append([req, timereq, end, url])
             q.task_done()
         except urllib2.HTTPError, e:
@@ -156,21 +152,19 @@ def checkurl(q):
 
             url_data.append([e, timereq, end, url])
             q.task_done()
-            return None, None, end
         except urllib2.URLError, e:
             end = time.time()
             timereq = end - start
+            print(e.reason)
 
             url_data.append([e, timereq, end, url])
             q.task_done()
-            return None, None, end
         except ssl.SSLError, e:
             end = time.time()
             timereq = end - start
 
             url_data.append([e, timereq, end, url])
             q.task_done()
-            return None, None, end
 
 
 
