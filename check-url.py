@@ -42,7 +42,7 @@ def main():
 
         fill_limit_data(file)
         for data in url_data:
-            format_response(data[3], data[0], data[1], data[5], data[6], data[4])
+            format_response(data[3], data[0], data[1], data[5], data[6], data[5], data[4])
 
         url_data = []
         if environ.get('DELAY') is not None:
@@ -80,7 +80,7 @@ def get_url_array(file):
     return urls
 
 
-def format_response(url, req, timereq, warning, danger, result):
+def format_response(url, req, timereq, warning, danger, result, err_message):
     retry = 0
     if req != None:
         timenow = time.strftime("%d/%m/%Y %H:%M:%S")
@@ -106,7 +106,7 @@ def format_response(url, req, timereq, warning, danger, result):
     else:
         etat = "danger"
         status_code = 2
-        message = "ERROR"
+        message = err_message
         retcode = "000"
         timereq = float(0.00)
         result = "0"
@@ -144,26 +144,26 @@ def checkurl(q):
             req = urllib2.urlopen(url, timeout = 2)
             end = time.time()
             timereq = end - start
-            url_data.append([req, timereq, end, url])
+            url_data.append([req, timereq, end, url, ""])
             q.task_done()
         except urllib2.HTTPError, e:
             end = time.time()
             timereq = end - start
 
-            url_data.append([e, timereq, end, url])
+            url_data.append([req, timereq, end, url, ""])
             q.task_done()
         except urllib2.URLError, e:
             end = time.time()
             timereq = end - start
-            print(e.reason)
 
-            url_data.append([e, timereq, end, url])
+            url_data.append([None, timereq, end, url, e.reason])
             q.task_done()
         except ssl.SSLError, e:
             end = time.time()
             timereq = end - start
+            print(e.reason)
 
-            url_data.append([e, timereq, end, url])
+            url_data.append([None, timereq, end, url, e.reason])
             q.task_done()
 
 
