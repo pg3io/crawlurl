@@ -2,7 +2,7 @@ version: '3.3'
 
 services:
   web:
-    image: registry.pg3.io:5000/pg3io/crawl:0.7.3
+    image: registry.pg3.io:5000/pg3io/crawl:0.7.10
     volumes:
       - ${PWD}/sources/:/sources/
       - ${PWD}/results/:/results/
