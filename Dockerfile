@@ -1,4 +1,4 @@
-FROM python:2-alpine
+FROM python:2.7.15-alpine
 
 WORKDIR /usr/src/app
 COPY requirements.txt ./
@@ -10,4 +10,4 @@ RUN mkdir /sources && touch /sources/list.txt
 ENV LIST="/sources/list.txt"
 VOLUME ['/sources/']
 
-CMD [ "python", "-u", "main.py" ]
+CMD [ "python2", "-u", "main.py" ]

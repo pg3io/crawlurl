@@ -140,8 +140,9 @@ def checkurl(q):
     while(True):
         url = q.get()
         try:
+            context = ssl._create_unverified_context()
             start = time.time()
-            req = urllib2.urlopen(url, timeout = 2)
+            req = urllib2.urlopen(url, timeout = 2, context=context)
             end = time.time()
             timereq = end - start
             url_data.append([req, timereq, end, url, ""])
@@ -150,20 +151,19 @@ def checkurl(q):
             end = time.time()
             timereq = end - start
 
-            url_data.append([req, timereq, end, url, ""])
+            url_data.append([req, timereq, end, url, "HTTP_ERROR"])
             q.task_done()
         except urllib2.URLError, e:
             end = time.time()
             timereq = end - start
 
-            url_data.append([None, timereq, end, url, e.reason])
+            url_data.append([None, timereq, end, url, "URL_ERROR"])
             q.task_done()
         except ssl.SSLError, e:
             end = time.time()
             timereq = end - start
-            print(e.reason)
 
-            url_data.append([None, timereq, end, url, e.reason])
+            url_data.append([None, timereq, end, url, "SSL_ERROR"])
             q.task_done()
 
 
