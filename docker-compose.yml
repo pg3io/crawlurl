@@ -4,7 +4,7 @@ services:
   web:
     image: registry.pg3.io:5000/pg3io/crawl:${VERSION:-latest}
     volumes:
-      - /data/crawl/:/sources/
+      - ./sources/list.yml:/sources/
     environment:
       - "LIST=/sources/list.yml"
     # logging into logstash
