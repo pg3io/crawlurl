@@ -1,7 +1,6 @@
-# POC - Check liste site web - Python
+# Check liste site web - Python
 
 ![langage](https://img.shields.io/badge/Langage-Python-green.svg) 
-![version](https://img.shields.io/badge/version-Alpha-red.svg)
 [![Twitter](https://img.shields.io/twitter/follow/pg3io.svg?style=social)](https://twitter.com/intent/follow?screen_name=pg3io)
 
 Vérifie qu'une liste de site internet est bien fonction
