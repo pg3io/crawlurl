@@ -59,7 +59,7 @@ docker run -d -v ${PWD}/list.txt:/sources/list.txt -e LIST=/sources/list.txt --n
 ### Docker Stack (+ logging gelf dans logstash)
 Pas besoin de builder l'image, elle est disponible sur notre registry
 ```
-docker stack deploy <NOM_STACK> -c docker-compose.yml
+VERSION=0.8.1 docker stack deploy <NOM_STACK> -c docker-compose.yml
 ```
 
 ## Fonctionnalitées futures
