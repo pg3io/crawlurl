@@ -1,20 +1,20 @@
-# POC - Check liste site web - Python
+# Check liste site web - Python
 
 ![langage](https://img.shields.io/badge/Langage-Python-green.svg) 
-![version](https://img.shields.io/badge/version-Alpha-red.svg)
 [![Twitter](https://img.shields.io/twitter/follow/pg3io.svg?style=social)](https://twitter.com/intent/follow?screen_name=pg3io)
 
-Vérifie qu'une liste de site internet est bien fonction
+Vérifie qu'une liste de site internet est bien en fonction
 
 ## Fonction
 ### Input
-Lister vos urls dans un fichier "txt" et un mot à chercher en fin de page (pour vérifier le chargement total de la page)
+Lister vos urls dans un fichier "yml"
 
-### output
-logging "stdout" format "Json"
 ```
 {"retcode": <CODE>, "url": <URLw>, "status_code": <CODE>, "result": <RES>, "timereq": <TEMPS_DE_REQUETE>, "message": <MESSAGE_RETOUR>}
 ```
+### output
+logging "stdout" format "Json"
+
 Le "status_code" peut prendre différentes valeurs :
 * 0 = Success
 * 1 = Warning, temps de réponse trop long
@@ -38,7 +38,8 @@ Exemple "list.yml"
     warning: 1
     critical: 0.15
     tags:
-      - tech
+      - prod
+      - test
 ```
 
 ## Exécution
