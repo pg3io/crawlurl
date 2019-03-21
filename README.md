@@ -26,15 +26,19 @@ Exemple
 {"retcode": 200, "url": "https://www.impots.gouv.fr/portail/", "status_code": 0, "timereq": 0.012618064880371094, "message": "ok"}
 ```
 
-### Synthaxe txt
+### Synthaxe Yaml
 ```
 <URL> <CONTENT_TO_MATCH> <TIME_WARNING||default:0.1> <TIME_CRITICAL||default:0.2>
 ```
 
-Exemple "list.txt"
+Exemple "list.yml"
 ```
-https://www.theverge.com phonographEvents 0.3 0.4
-https://www.impots.gouv.fr/portail/ mention-legales
+  - url: https://theverge.com
+    search: 
+    warning: 1
+    critical: 0.15
+    tags:
+      - tech
 ```
 
 ## Exécution
@@ -43,7 +47,7 @@ https://www.impots.gouv.fr/portail/ mention-legales
 ```
 export DELAY=<DELAI_ENTRE_TESTS>
 export THREAD=<NOMBRE_THREAD_MAX>
-export LIST=${PWD}/list.txt
+export LIST=${PWD}/list.yml
 python check-url.py
 ```
 
@@ -65,6 +69,7 @@ docker stack deploy <NOM_STACK> -c docker-compose.yml
 - [x] Variabiliser la tempo entre chaque lot de test
 - [x] Multithread des requêtes
 - [x] Variabiliser le nombre de Thread
+- [x] Support du format yaml pour le fichier source
 - [ ] Source url/mot db (mariadb)
 - [ ] Ajout d'informations dans le log json (taille de la page ...)
 

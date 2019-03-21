@@ -1,33 +1,32 @@
 #!/usr/bin/python
 
 import os
-from os import environ
 import urllib2
 import time
 import ssl
 import json
 from threading import Thread
 import Queue
+import yaml
+import certifi
 
 filesource = os.environ['LIST']
-if environ.get('THREAD') is not None:
-    nbr_thread = os.environ['THREAD']
-if environ.get('DELAY') is not None:
-    delay = os.environ['DELAY']
-
 url_data = []
 
 def main():
     global url_data
     q = Queue.Queue(maxsize=0)
+    file = open_file()
 
-    if environ.get('THREAD') is not None:
-        for i in range(int(nbr_thread)):
+    try:
+        file['thread']
+    except:
+        for i in range(int(1)):
             t = Thread(target=checkurl, args=(q,))
             t.daemon = True
             t.start()
     else:
-        for i in range(int(1)):
+        for i in range(int(file['thread'])):
             t = Thread(target=checkurl, args=(q,))
             t.daemon = True
             t.start()
@@ -42,51 +41,73 @@ def main():
 
         fill_limit_data(file)
         for data in url_data:
-            format_response(data[3], data[0], data[1], data[5], data[6], data[5], data[4])
+            format_response(data[3], data[0], data[1], data[6], data[7], data[5], data[4], data[8])
 
         url_data = []
-        if environ.get('DELAY') is not None:
-            time.sleep(float(delay))
-        else:
+
+        try:
+            file['delay']
+        except:
             time.sleep(30)
+        else:
+            time.sleep(float(file['delay']))
 
 
 def fill_limit_data(file):
-    for line in file:
-        split_line = line.split(" ")
+    for line in file['website']:
         for data in url_data:
-            if split_line[0] == data[3]:
-                data.append(split_line[1])
+            if line['url'] == data[3]:
                 try:
-                    split_line[2]
+                    line['search']
+                except:
+                    data.append('')
+                else:
+                    data.append(line['search'])
+
+                try:
+                    line['warning']
                 except:
                     data.append(0.2)
                 else:
-                    data.append(split_line[2])
+                    data.append(line['warning'])
+
                 try:
-                    split_line[3]
+                    line['critical']
                 except:
                     data.append(0.3)
                 else:
-                    data.append(split_line[3])
+                    data.append(line['critical'])
+
+                try:
+                    line['tags']
+                except:
+                    data.append('')
+                else:
+                    data.append(line['tags'])
+
 
 
 def get_url_array(file):
     urls = []
 
-    for line in file:
-        urls.append(line.partition(' ')[0])
+    for url in file['website']:
+        urls.append(url['url'])
 
     return urls
 
 
-def format_response(url, req, timereq, warning, danger, result, err_message):
+def format_response(url, req, timereq, warning, danger, result, err_message, tags):
     retry = 0
     if req != None:
         timenow = time.strftime("%d/%m/%Y %H:%M:%S")
         retcode = req.getcode()
         html = req.read()
-        result = html.count(result)
+
+        try:
+            result = html.count(result)
+        except:
+            result = 0
+
         if timereq > danger or retry > 0:
             etat = "danger"
             status_code = 2
@@ -104,26 +125,24 @@ def format_response(url, req, timereq, warning, danger, result, err_message):
             status_code = 0
             message = "ok"
     else:
-        etat = "danger"
         status_code = 2
         message = err_message
         retcode = "000"
         timereq = float(0.00)
-        result = "0"
-    format_to_json(status_code, timereq, url, retcode, message)
-    temp.close()
+    format_to_json(status_code, timereq, url, retcode, message, tags)
 
 
 def open_file():
-    global temp
-    temp = open("%s" % filesource ,"r")
-    file = temp.read().splitlines()
-    temp.close()
+    with open(filesource, 'r') as stream:
+        try:
+            file = yaml.load(stream)
+        except yaml.YAMLError as exc:
+            print(exc)
 
     return file
 
 
-def format_to_json(status_code, timereq, url, retcode, message):
+def format_to_json(status_code, timereq, url, retcode, message, tags):
     data = {}
 
     data['status_code'] = status_code
@@ -131,6 +150,8 @@ def format_to_json(status_code, timereq, url, retcode, message):
     data['url'] = url
     data['retcode'] = retcode
     data['message'] = message
+    if tags != '':
+        data['tags'] = tags
     data_json = json.dumps(data)
 
     print(data_json)
@@ -140,9 +161,8 @@ def checkurl(q):
     while(True):
         url = q.get()
         try:
-            context = ssl._create_unverified_context()
             start = time.time()
-            req = urllib2.urlopen(url, timeout = 2, context=context)
+            req = urllib2.urlopen(url, timeout = 2, cafile=certifi.where())
             end = time.time()
             timereq = end - start
             url_data.append([req, timereq, end, url, ""])

@@ -1,0 +1,10 @@
+delay: 30
+thread: 2
+website:
+  - url: https://www.theverge.com
+    search: phonographEvents
+    warning: 0.3
+    critical: 0.4
+
+  - url: https://www.impots.gouv.fr/portail/
+    search: mention-legales

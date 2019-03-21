@@ -2,17 +2,14 @@ version: '3.3'
 
 services:
   web:
-    image: registry.pg3.io:5000/pg3io/crawl:0.7.10
+    image: registry.pg3.io:5000/pg3io/crawl:${VERSION:-latest}
     volumes:
-      - ${PWD}/sources/:/sources/
-      - ${PWD}/results/:/results/
+      - /data/crawl/:/sources/
     environment:
-      - "LIST=/sources/list.txt"
-      - "THREAD=2"
-      - "DELAY=5"
+      - "LIST=/sources/list.yml"
     # logging into logstash
-    #logging:
-    #  driver: gelf
-    #  options:
-    #    gelf-address: udp://127.0.0.1:12201
-    #    tag: crawl.status
+    logging:
+      driver: gelf
+      options:
+        gelf-address: udp://127.0.0.1:12201
+        tag: crawl.status
