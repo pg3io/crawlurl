@@ -6,29 +6,18 @@
 Vérifie qu'une liste de site internet est bien en fonction
 
 ## Fonction
+
+
 ### Input
-Lister vos urls dans un fichier "yml"
-
+Lister vos urls dans un fichier "yml" > Yaml
 ```
-{"retcode": <CODE>, "url": <URLw>, "status_code": <CODE>, "result": <RES>, "timereq": <TEMPS_DE_REQUETE>, "message": <MESSAGE_RETOUR>}
-```
-### output
-logging "stdout" format "Json"
-
-Le "status_code" peut prendre différentes valeurs :
-* 0 = Success
-* 1 = Warning, temps de réponse trop long
-* 2 = Critical, timeout et 404
-
-Exemple
-```
-{"retcode": 200, "url": "https://www.theverge.com", "status_code": 0, "timereq": 0.023188114166259766, "message": "ok"}
-{"retcode": 200, "url": "https://www.impots.gouv.fr/portail/", "status_code": 0, "timereq": 0.012618064880371094, "message": "ok"}
-```
-
-### Synthaxe Yaml
-```
-<URL> <CONTENT_TO_MATCH> <TIME_WARNING||default:0.1> <TIME_CRITICAL||default:0.2>
+  - url: <URL>
+    search: <CONTENT_TO_MATCH>
+    warning: <TIME_WARNING>
+    critical: <TIME_CRITICAL>
+    tags:
+      - <tag1>
+      - <tag2>
 ```
 
 Exemple "list.yml"
@@ -40,6 +29,25 @@ Exemple "list.yml"
     tags:
       - prod
       - test
+```
+
+
+### output
+logging "stdout" format "Json"
+
+Le "status_code" peut prendre différentes valeurs :
+* 0 = Success
+* 1 = Warning, temps de réponse trop long
+* 2 = Critical, timeout et 404
+
+```
+{"retcode": <CODE>, "url": <URLw>, "status_code": <CODE>, "result": <RES>, "timereq": <TEMPS_DE_REQUETE>, "message": <MESSAGE_RETOUR>}
+```
+
+Exemple
+```
+{"retcode": 200, "url": "https://www.theverge.com", "status_code": 0, "timereq": 0.023188114166259766, "message": "ok"}
+{"retcode": 200, "url": "https://www.impots.gouv.fr/portail/", "status_code": 0, "timereq": 0.012618064880371094, "message": "ok"}
 ```
 
 ## Exécution
