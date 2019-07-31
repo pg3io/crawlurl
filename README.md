@@ -10,11 +10,13 @@ Vérifie qu'une liste de site internet est bien en fonction
 
 ### Input
 Lister vos urls dans un fichier "yml" > Yaml
+Le paramètre API permet de ne checker que le header de la réponse
 ```
   - url: <URL>
     search: <CONTENT_TO_MATCH>
     warning: <TIME_WARNING>
     critical: <TIME_CRITICAL>
+    api: <BOLLEAN VALUE>
     tags:
       - <tag1>
       - <tag2>
@@ -41,12 +43,12 @@ Le "status_code" peut prendre différentes valeurs :
 * 2 = Critical, timeout et 404
 
 ```
-{"retcode": <CODE>, "url": <URLw>, "status_code": <CODE>, "result": <RES>, "timereq": <TEMPS_DE_REQUETE>, "message": <MESSAGE_RETOUR>}
+{"retcode": <CODE>, "url": <URLw>, "status_code": <CODE>, "result": <RES>, "timereq": <TEMPS_DE_REQUETE>, "message": <MESSAGE_RETOUR>, "tags": [tag, tag]}
 ```
 
 Exemple
 ```
-{"retcode": 200, "url": "https://www.theverge.com", "status_code": 0, "timereq": 0.023188114166259766, "message": "ok"}
+{"retcode": 200, "url": "https://www.theverge.com", "status_code": 0, "timereq": 0.023188114166259766, "message": "ok", "tags": ["prod", "example"]}
 {"retcode": 200, "url": "https://www.impots.gouv.fr/portail/", "status_code": 0, "timereq": 0.012618064880371094, "message": "ok"}
 ```
 
