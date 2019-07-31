@@ -1,21 +1,19 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 
 import os
-import urllib2
 import time
-import ssl
 import json
 from threading import Thread
-import Queue
+import queue as queue
 import yaml
-import certifi
+import requests
 
 filesource = os.environ['LIST']
 url_data = []
 
 def main():
     global url_data
-    q = Queue.Queue(maxsize=0)
+    q = queue.Queue()
     file = open_file()
 
     try:
@@ -31,11 +29,10 @@ def main():
             t.daemon = True
             t.start()
 
-    while True:
+    while 42:
         file = open_file()
         urls = get_url_array(file)
         for url in urls:
-            if url[0] != "#":
                 q.put(url)
         q.join()
 
@@ -85,23 +82,35 @@ def fill_limit_data(file):
                 else:
                     data.append(line['tags'])
 
+                try:
+                    line['api']
+                except:
+                    data.append('')
+                else:
+                    data.append(line['api'])
+
 
 
 def get_url_array(file):
     urls = []
 
     for url in file['website']:
-        urls.append(url['url'])
+        try:
+            url['search']
+        except:
+            urls.append([url['url'], False])
+        else:
+            urls.append([url['url'], True])
 
     return urls
 
 
 def format_response(url, req, timereq, warning, danger, result, err_message, tags):
     retry = 0
-    if req != None:
+    if req != None and err_message == '':
         timenow = time.strftime("%d/%m/%Y %H:%M:%S")
-        retcode = req.getcode()
-        html = req.read()
+        retcode = req.status_code
+        html = req.text
 
         try:
             result = html.count(result)
@@ -109,19 +118,22 @@ def format_response(url, req, timereq, warning, danger, result, err_message, tag
             result = 0
 
         if timereq > danger or retry > 0:
-            etat = "danger"
+            #"danger"
             status_code = 2
             message = "retry_or_%s_second_time_out" % danger
         elif result <= 0:
-            etat = "danger"
+            #"danger"
             status_code = 2
             message = "no_word_in_page"
         elif timereq > warning:
-            etat = "warning"
+            #"warning"
             status_code = 1
             message = "%s_second_time_out" % warning
+        elif retcode < 200 and retcode > 226:
+            status_code = 2
+            message = 'return code of url isn\'t 200 : %s' % retcode
         else:
-            etat = "success"
+            #"success"
             status_code = 0
             message = "ok"
     else:
@@ -156,34 +168,20 @@ def format_to_json(status_code, timereq, url, retcode, message, tags):
 
     print(data_json)
 
-
 def checkurl(q):
     while(True):
         url = q.get()
         try:
-            start = time.time()
-            req = urllib2.urlopen(url, timeout = 2, cafile=certifi.where())
-            end = time.time()
-            timereq = end - start
-            url_data.append([req, timereq, end, url, ""])
-            q.task_done()
-        except urllib2.HTTPError, e:
-            end = time.time()
-            timereq = end - start
-
-            url_data.append([req, timereq, end, url, "HTTP_ERROR"])
-            q.task_done()
-        except urllib2.URLError, e:
-            end = time.time()
-            timereq = end - start
-
-            url_data.append([None, timereq, end, url, "URL_ERROR"])
-            q.task_done()
-        except ssl.SSLError, e:
-            end = time.time()
-            timereq = end - start
-
-            url_data.append([None, timereq, end, url, "SSL_ERROR"])
+            if url[1] == True:
+                req = requests.get(url[0], timeout=10.0)
+                url_data.append([req, req.elapsed.total_seconds(), '', url[0], ""])
+                q.task_done()
+            else:
+                req = requests.head(url[0], timeout=10.0)
+                url_data.append([req, req.elapsed.total_seconds(), '', url[0], ""])
+                q.task_done()
+        except requests.exceptions.RequestException as e:
+            url_data.append([req, req.elapsed.total_seconds(), '', url[0], str(e)])
             q.task_done()
 
 
