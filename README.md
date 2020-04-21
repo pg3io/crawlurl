@@ -1,56 +1,10 @@
-# Check liste site web - Python
+# crawlurl - Check liste site web
 
 ![langage](https://img.shields.io/badge/Langage-Python-green.svg) 
-[![Twitter](https://img.shields.io/twitter/follow/pg3io.svg?style=social)](https://twitter.com/intent/follow?screen_name=pg3io)
+![Apache 2.0 Licence](https://img.shields.io/hexpm/l/plug.svg)
 
-Vérifie qu'une liste de site internet est bien en fonction
-
-## Fonction
-
-
-### Input
-Lister vos urls dans un fichier "yml" > Yaml
-Le paramètre API permet de ne checker que le header de la réponse
-```
-  - url: <URL>
-    search: <CONTENT_TO_MATCH>
-    warning: <TIME_WARNING>
-    critical: <TIME_CRITICAL>
-    api: <BOLLEAN VALUE>
-    tags:
-      - <tag1>
-      - <tag2>
-```
-
-Exemple "list.yml"
-```
-  - url: https://theverge.com
-    search: 
-    warning: 1
-    critical: 0.15
-    tags:
-      - prod
-      - test
-```
-
-
-### output
-logging "stdout" format "Json"
-
-Le "status_code" peut prendre différentes valeurs :
-* 0 = Success
-* 1 = Warning, temps de réponse trop long
-* 2 = Critical, timeout et 404
-
-```
-{"retcode": <CODE>, "url": <URLw>, "status_code": <CODE>, "result": <RES>, "timereq": <TEMPS_DE_REQUETE>, "message": <MESSAGE_RETOUR>, "tags": [tag, tag]}
-```
-
-Exemple
-```
-{"retcode": 200, "url": "https://www.theverge.com", "status_code": 0, "timereq": 0.023188114166259766, "message": "ok", "tags": ["prod", "example"]}
-{"retcode": 200, "url": "https://www.impots.gouv.fr/portail/", "status_code": 0, "timereq": 0.012618064880371094, "message": "ok"}
-```
+Vérifie qu'une liste de site internet est bien en fonction.
+[Docuementation](https://github.com/pg3io/crawlurl/wiki)
 
 ## Exécution
 * La variable d'environnement "DELAY" est optionelle, par défaut elle sera d'une valeur de 30 secondes
@@ -85,10 +39,8 @@ VERSION=0.8.1 docker stack deploy <NOM_STACK> -c docker-compose.yml
 - [ ] Ajout d'informations dans le log json (taille de la page ...)
 
 # License
+Ce projet est sous licence [Apache 2.0](https://www.apache.org/licenses/LICENSE-2.0) consulter le fichier [LICENSE](LICENSE) pour plus de détails.
 
-![Apache 2.0 Licence](https://img.shields.io/hexpm/l/plug.svg)
 
-This project is licensed under the [Apache 2.0](https://www.apache.org/licenses/LICENSE-2.0) license - see the [LICENSE](LICENSE) file for details.
-
-# Author Information
-This role was created in 21/12/2018 by [PG3](https://pg3.io)
+# Informations sur l'auteur
+Ce projet a été créé par [PG3](https://pg3.io) en décembre 2018. 
