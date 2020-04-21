@@ -147,7 +147,7 @@ def format_response(url, req, timereq, warning, danger, result, err_message, tag
 def open_file():
     with open(filesource, 'r') as stream:
         try:
-            file = yaml.load(stream)
+            file = yaml.load(stream, Loader=yaml.FullLoader)
         except yaml.YAMLError as exc:
             print(exc)
 
