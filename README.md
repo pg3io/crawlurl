@@ -4,7 +4,7 @@
 ![Apache 2.0 Licence](https://img.shields.io/hexpm/l/plug.svg)
 
 Vérifie qu'une liste de site internet est bien en fonction.
-[Docuementation](https://github.com/pg3io/crawlurl/wiki)
+[Documentation](https://github.com/pg3io/crawlurl/wiki)
 
 ## Exécution
 * La variable d'environnement "DELAY" est optionelle, par défaut elle sera d'une valeur de 30 secondes
