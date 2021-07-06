@@ -14,8 +14,12 @@ import re
 from influxdb_client import InfluxDBClient
 from influxdb_client.client.write_api import SYNCHRONOUS
 
+try:
+    filesource = os.environ['LIST']
+except KeyError:
+    print('Missing LIST environnement variable, exiting.')
+    exit(1)
 
-filesource = os.environ['LIST']
 url_data = []
 
 def main():
