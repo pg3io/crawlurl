@@ -4,7 +4,7 @@
 ![Apache 2.0 Licence](https://img.shields.io/hexpm/l/plug.svg)
 
 Vérifie qu'une liste de site internet est bien en fonction.
-
+Transmet des informations sur la réponse de ces sites à une base de données.
 Affiche les indices de bon fonctionnement de ces sites sur Grafana.
 
 [Documentation](https://github.com/pg3io/crawlurl/wiki)
@@ -17,12 +17,12 @@ Le script peut etre utilisé pour logger les indices ou les transmettre à Influ
 * Toutes les autres variables d'environnement concernent la base de données et sont donc optionnelles.
 * Si la variable d'environnement INFLUXDB-HOST est définie et n'est pas vide, crawlurl fonctionnera avec Grafana
 
-### sans Grafana (indices loggés dans le terminal)
+### sans InfluxDB (indices loggés dans le terminal)
 ```
 export LIST=${PWD}/list.yml
 python check-url.py
 ```
-### avec Grafana
+### avec InfluxDB
 ```
 export "LIST=${PWD}/list.yml"
 export "INFLUXDB-HOST=http://localhost:8086"
@@ -34,7 +34,7 @@ python check-url.py
 
 ### Docker
 ```
-docker-compose build && docker-compose up
+docker-compose build --no-cache && docker-compose up -d
 ```
 
 ## Fonctionnalitées futures
@@ -54,3 +54,4 @@ Ce projet est sous licence [Apache 2.0](https://www.apache.org/licenses/LICENSE-
 
 # Informations sur l'auteur
 Ce projet a été créé par [PG3](https://pg3.io) en décembre 2018.
+Ce projet a été maintenu par [PG3](https://pg3.io) en juillet 2021.
