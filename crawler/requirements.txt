@@ -2,3 +2,5 @@ queuelib
 threaded
 pyyaml
 certifi
+requests
+influxdb-client

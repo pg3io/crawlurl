@@ -4,9 +4,16 @@ import os
 import time
 import json
 from threading import Thread
-import queue as queue
+from urllib3.exceptions import NewConnectionError
+import queue
 import yaml
 import requests
+from datetime import datetime
+import re
+
+from influxdb_client import InfluxDBClient
+from influxdb_client.client.write_api import SYNCHRONOUS
+
 
 filesource = os.environ['LIST']
 url_data = []
@@ -15,6 +22,7 @@ def main():
     global url_data
     q = queue.Queue()
     file = open_file()
+    write_api = connect_to_influxdb()
 
     try:
         file['thread']
@@ -38,7 +46,7 @@ def main():
 
         fill_limit_data(file)
         for data in url_data:
-            format_response(data[3], data[0], data[1], data[6], data[7], data[5], data[4], data[8])
+            format_response(write_api, data[3], data[0], data[1], data[6], data[7], data[5], data[4], data[8])
 
         url_data = []
 
@@ -105,7 +113,7 @@ def get_url_array(file):
     return urls
 
 
-def format_response(url, req, timereq, warning, danger, result, err_message, tags):
+def format_response(write_api, url, req, timereq, warning, danger, result, err_message, tags):
     retry = 0
     if req != None and err_message == '':
         timenow = time.strftime("%d/%m/%Y %H:%M:%S")
@@ -141,7 +149,7 @@ def format_response(url, req, timereq, warning, danger, result, err_message, tag
         message = err_message
         retcode = "000"
         timereq = float(0.00)
-    format_to_json(status_code, timereq, url, retcode, message, tags)
+    format_to_json(write_api, status_code, timereq, url, retcode, message, tags)
 
 
 def open_file():
@@ -154,7 +162,36 @@ def open_file():
     return file
 
 
-def format_to_json(status_code, timereq, url, retcode, message, tags):
+def insert_to_influxdb(write_api, data_json):
+    flag = False
+    array = [
+        data_json["url"],
+        data_json["status_code"],
+        data_json["timereq"],
+        data_json["retcode"],
+        data_json["message"]
+    ]
+    try:
+        array.append(data_json["tags"])
+    except KeyError:
+        pass
+    else:
+        flag = True
+    sequence = [
+        f'server_response,host={array[0]} status_code={array[1]},timereq={array[2]},retcode={array[3]},message="{array[4]}"'
+    ]
+    if flag:
+        sequence.append(f'tags,host={array[0]} tags="{array[5]}"')
+    while True:
+        try:
+            write_api.write(os.environ['INFLUXDB-BUCKET'], os.environ['INFLUXDB-ORG'], sequence)
+        except:
+            print('Waiting 10 seconds for InfluxDB to start...')
+            time.sleep(10)
+        else:
+            break
+
+def format_to_json(write_api, status_code, timereq, url, retcode, message, tags):
     data = {}
 
     data['status_code'] = status_code
@@ -165,8 +202,11 @@ def format_to_json(status_code, timereq, url, retcode, message, tags):
     if tags != '':
         data['tags'] = tags
     data_json = json.dumps(data)
+    if write_api != None:
+        insert_to_influxdb(write_api, data)
+    else:
+        print(data_json)
 
-    print(data_json)
 
 def checkurl(q):
     while(True):
@@ -185,8 +225,29 @@ def checkurl(q):
             q.task_done()
 
 
-
-
+def connect_to_influxdb():
+    try:
+        influxdb_host = os.environ['INFLUXDB-HOST']
+    except:
+        print('INFLUXDB-HOST environnement variable is not set, running without InfluxDB')
+        return None
+    else:
+        if (influxdb_host != None and influxdb_host != ''):
+            try:
+                os.environ['INFLUXDB-TOKEN']
+                os.environ['INFLUXDB-ORG']
+                os.environ['INFLUXDB-BUCKET']
+            except:
+                print('INFLUXDB-HOST is defined please define INFLUX-TOKEN, INFLUX-ORG and INFLUX-BUCKET environnement variables.')
+                exit(1)
+        else:
+            print('INFLUXDB-HOST environnement variable is empty, running without InfluxDB')
+            return None       
+        if (influxdb_host != None and influxdb_host != ''):
+            client = InfluxDBClient(url=influxdb_host, token=os.environ['INFLUXDB-TOKEN'])
+            return client.write_api(write_options=SYNCHRONOUS)
+        
+    
 
 if __name__ == '__main__':
     while True:
