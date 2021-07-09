@@ -4,27 +4,37 @@
 ![Apache 2.0 Licence](https://img.shields.io/hexpm/l/plug.svg)
 
 Vérifie qu'une liste de site internet est bien en fonction.
+Transmet des informations sur la réponse de ces sites à une base de données.
+Affiche les indices de bon fonctionnement de ces sites sur Grafana.
+
 [Documentation](https://github.com/pg3io/crawlurl/wiki)
 
 ## Exécution
-* La variable d'environnement "DELAY" est optionelle, par défaut elle sera d'une valeur de 30 secondes
-* La variable d'environnement "THREAD" est optionelle, par défaut elle sera d'une valeur de 2
+
+Le script peut etre utilisé pour logger les indices ou les transmettre à InfluxDB qui affiche ces indices dans Grafana.
+
+* La variable d'environnement LIST est obligatoire, elle doit pointer sur le fichier yaml de configuration
+* Toutes les autres variables d'environnement concernent la base de données et sont donc optionnelles.
+* Si la variable d'environnement INFLUXDB-HOST est définie et n'est pas vide, crawlurl fonctionnera avec Grafana
+
+### sans InfluxDB (indices loggés dans le terminal)
 ```
-export DELAY=<DELAI_ENTRE_TESTS>
-export THREAD=<NOMBRE_THREAD_MAX>
 export LIST=${PWD}/list.yml
+python check-url.py
+```
+### avec InfluxDB
+```
+export "LIST=${PWD}/list.yml"
+export "INFLUXDB-HOST=http://localhost:8086"
+export "INFLUXDB-BUCKET=bucket"
+export "INFLUXDB-TOKEN=token"
+export "INFLUXDB-ORG=org"
 python check-url.py
 ```
 
 ### Docker
 ```
-docker build -t monit/crawl:1.0 . --no-cache
-docker run -d -v ${PWD}/list.txt:/sources/list.txt -e LIST=/sources/list.txt --name crawl monit/crawl:1.0
-```
-### Docker Stack (+ logging gelf dans logstash)
-Pas besoin de builder l'image, elle est disponible sur notre registry
-```
-VERSION=0.8.1 docker stack deploy <NOM_STACK> -c docker-compose.yml
+docker-compose build --no-cache && docker-compose up -d
 ```
 
 ## Fonctionnalitées futures
@@ -43,4 +53,5 @@ Ce projet est sous licence [Apache 2.0](https://www.apache.org/licenses/LICENSE-
 
 
 # Informations sur l'auteur
-Ce projet a été créé par [PG3](https://pg3.io) en décembre 2018. 
+Ce projet a été créé par [PG3](https://pg3.io) en décembre 2018.
+Ce projet a été maintenu par [PG3](https://pg3.io) en juillet 2021.
