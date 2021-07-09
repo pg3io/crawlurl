@@ -123,13 +123,14 @@ def format_response(write_api, db_con, url, req, timereq, warning, danger, resul
         timenow = time.strftime("%d/%m/%Y %H:%M:%S")
         retcode = req.status_code
         html = req.text
-
         try:
             result = html.count(result)
         except:
             result = 0
-
-        if timereq > danger or retry > 0:
+        if retcode < 200 or retcode > 226:
+            status_code = 2
+            message = 'return code of url isn\'t 200 : %s' % retcode
+        elif timereq > danger or retry > 0:
             #"danger"
             status_code = 2
             message = "retry_or_%s_second_time_out" % danger
@@ -141,9 +142,6 @@ def format_response(write_api, db_con, url, req, timereq, warning, danger, resul
             #"warning"
             status_code = 1
             message = "%s_second_time_out" % warning
-        elif retcode < 200 and retcode > 226:
-            status_code = 2
-            message = 'return code of url isn\'t 200 : %s' % retcode
         else:
             #"success"
             status_code = 0
