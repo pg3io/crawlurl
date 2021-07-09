@@ -16,8 +16,9 @@ from influxdb_client.client.write_api import SYNCHRONOUS
 try:
     filesource = os.environ['LIST']
 except KeyError:
-    print('Error: LIST environnement variable is mandatory.')
+    print('Missing LIST environnement variable, exiting.')
     exit(1)
+
 url_data = []
 
 def main():
@@ -46,10 +47,13 @@ def main():
         for url in urls:
                 q.put(url)
         q.join()
+
         fill_limit_data(file)
         for data in url_data:
             db_con = format_response(write_api, db_con, data[3], data[0], data[1], data[6], data[7], data[5], data[4], data[8])
+        
         url_data.clear()
+
         try:
             file['delay']
         except:
