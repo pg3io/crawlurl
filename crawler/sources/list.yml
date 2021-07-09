@@ -1,0 +1,14 @@
+delay: 5
+thread: 3
+website:  
+  - url: https://www.theverge.com
+    search: phonographEvents
+    warning: 0.3
+
+  - url: https://www.impots.gouv.fr/portail
+    search: mention-legales
+    tags:
+      - title
+      - gouv
+
+  - url: https://minecraft.net

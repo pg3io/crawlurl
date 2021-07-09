@@ -1,15 +1,14 @@
-#!/usr/bin/python3
-
+#!/usr/bin/python
 import os
 import time
 import json
+import re
 from threading import Thread
-from urllib3.exceptions import NewConnectionError
 import queue
 import yaml
 import requests
 from datetime import datetime
-import re
+import urllib3.request as req3
 
 from influxdb_client import InfluxDBClient
 from influxdb_client.client.write_api import SYNCHRONOUS
@@ -17,12 +16,12 @@ from influxdb_client.client.write_api import SYNCHRONOUS
 try:
     filesource = os.environ['LIST']
 except KeyError:
-    print('Missing LIST environnement variable, exiting.')
+    print('Error: LIST environnement variable is mandatory.')
     exit(1)
-
 url_data = []
 
 def main():
+    db_con = False
     global url_data
     q = queue.Queue()
     file = open_file()
@@ -47,13 +46,10 @@ def main():
         for url in urls:
                 q.put(url)
         q.join()
-
         fill_limit_data(file)
         for data in url_data:
-            format_response(write_api, data[3], data[0], data[1], data[6], data[7], data[5], data[4], data[8])
-
-        url_data = []
-
+            db_con = format_response(write_api, db_con, data[3], data[0], data[1], data[6], data[7], data[5], data[4], data[8])
+        url_data.clear()
         try:
             file['delay']
         except:
@@ -117,7 +113,7 @@ def get_url_array(file):
     return urls
 
 
-def format_response(write_api, url, req, timereq, warning, danger, result, err_message, tags):
+def format_response(write_api, db_con, url, req, timereq, warning, danger, result, err_message, tags):
     retry = 0
     if req != None and err_message == '':
         timenow = time.strftime("%d/%m/%Y %H:%M:%S")
@@ -153,7 +149,7 @@ def format_response(write_api, url, req, timereq, warning, danger, result, err_m
         message = err_message
         retcode = "000"
         timereq = float(0.00)
-    format_to_json(write_api, status_code, timereq, url, retcode, message, tags)
+    return (format_to_json(write_api, db_con, status_code, timereq, url, retcode, message, tags))
 
 
 def open_file():
@@ -166,7 +162,7 @@ def open_file():
     return file
 
 
-def insert_to_influxdb(write_api, data_json):
+def insert_to_influxdb(write_api, db_con, data_json):
     flag = False
     array = [
         data_json["url"],
@@ -189,13 +185,18 @@ def insert_to_influxdb(write_api, data_json):
     while True:
         try:
             write_api.write(os.environ['INFLUXDB-BUCKET'], os.environ['INFLUXDB-ORG'], sequence)
-        except:
+        except Exception as e:
             print('Waiting 10 seconds for InfluxDB to start...')
+            print('Script is unable to connect :\n', str(e))
             time.sleep(10)
         else:
+            if not db_con:
+                print('Connected to  InfluxDB !')
             break
+    return True
 
-def format_to_json(write_api, status_code, timereq, url, retcode, message, tags):
+
+def format_to_json(write_api, db_con, status_code, timereq, url, retcode, message, tags):
     data = {}
 
     data['status_code'] = status_code
@@ -207,14 +208,19 @@ def format_to_json(write_api, status_code, timereq, url, retcode, message, tags)
         data['tags'] = tags
     data_json = json.dumps(data)
     if write_api != None:
-        insert_to_influxdb(write_api, data)
+        insert_to_influxdb(write_api, db_con, data)
+        return True
     else:
         print(data_json)
+        return False
 
 
 def checkurl(q):
-    while(True):
+    flag = False
+    while True:
         url = q.get()
+        if flag:
+            url[0] = re.sub(r"\/[a-z0-9].", '/', url[0])
         try:
             if url[1] == True:
                 req = requests.get(url[0], timeout=10.0)
@@ -224,9 +230,11 @@ def checkurl(q):
                 req = requests.head(url[0], timeout=10.0)
                 url_data.append([req, req.elapsed.total_seconds(), '', url[0], ""])
                 q.task_done()
-        except requests.exceptions.RequestException as e:
-            url_data.append([req, req.elapsed.total_seconds(), '', url[0], str(e)])
-            q.task_done()
+        except Exception as e:
+            if e == requests.ReadTimeout:
+                flag = True
+            else:
+                print(e)
 
 
 def connect_to_influxdb():

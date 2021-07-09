@@ -6,21 +6,10 @@ services:
     ports:
       - '8086:8086'
     volumes:
-      - ./influxdbv2:/.influxdbv2
+      - ./influxdbv2:/root/.influxdbv2
     networks:
-      - db-to-cli
       - app-to-db
       - db-to-grafana
-
-
-  influxdb_cli:
-    image: quay.io/influxdb/influxdb:v2.0.3
-    entrypoint: influx setup --bucket crawl-url -t EEFjBxGQ8fnmNVnOLSPktSKfAikEfC0vFaP_XhS0TDJ_24qH6YAcMpi7xJncNMKuBbbE0831qLx8goi2AxUQUg== -o PG3 --username=pg3 --password=password --host=http://db:8086 -f
-    restart: on-failure:10
-    networks:
-      - db-to-cli
-    depends_on:
-      - db
     
 
   grafana:
@@ -33,13 +22,11 @@ services:
       - db-to-grafana
     depends_on:
       - db
-      - influxdb_cli
 
   
   web:
     depends_on:
       - db
-      - influxdb_cli
     restart: on-failure:10
     build: crawler
     volumes:
@@ -47,7 +34,7 @@ services:
     environment:
       - "INFLUXDB-HOST=http://db:8086"
       - LIST=/sources/list.yml
-      - INFLUXDB-TOKEN=EEFjBxGQ8fnmNVnOLSPktSKfAikEfC0vFaP_XhS0TDJ_24qH6YAcMpi7xJncNMKuBbbE0831qLx8goi2AxUQUg==
+      - INFLUXDB-TOKEN=VEOGVLkGuu-gQu9RPcPhOZCtsfYOIEOEQHuax-C6hMJwKoA0BXJmfvSlczEIxBvsCyHwmV2UuaNrdmK3azdaqw==
       - INFLUXDB-ORG=PG3
       - INFLUXDB-BUCKET=crawl-url
     networks:
@@ -55,6 +42,5 @@ services:
 
 networks:
   app-to-db:
-  db-to-cli:
   db-to-grafana:
 
