@@ -1,14 +1,11 @@
 #!/usr/bin/python
 import os
 import time
-import json
 import re
 from threading import Thread
 import queue
 import yaml
 import requests
-from datetime import datetime
-import urllib3.request as req3
 
 from influxdb_client import InfluxDBClient
 from influxdb_client.client.write_api import SYNCHRONOUS
@@ -42,7 +39,6 @@ def main():
             t.start()
 
     while 42:
-        file = open_file()
         urls = get_url_array(file)
         for url in urls:
                 q.put(url)
@@ -160,31 +156,17 @@ def open_file():
             file = yaml.load(stream, Loader=yaml.FullLoader)
         except yaml.YAMLError as exc:
             print(exc)
-
     return file
 
 
 def insert_to_influxdb(write_api, db_con, data_json):
-    flag = False
-    array = [
-        data_json["url"],
-        data_json["status_code"],
-        data_json["timereq"],
-        data_json["retcode"],
-        data_json["message"]
+    sequence = [
+        f'''server_response,host={data_json['url']} status_code={data_json['status_code']},timereq={data_json['timereq']},retcode={data_json['retcode']},message="{data_json['message']}"'''
     ]
     try:
-        array.append(data_json["tags"])
-    except KeyError:
-        pass
-    else:
-        flag = True
-    sequence = [
-        f'server_response,host={array[0]} status_code={array[1]},timereq={array[2]},retcode={array[3]},message="{array[4]}"'
-    ]
-    if flag:
-        sequence.append(f'tags,host={array[0]} tags="{array[5]}"')
-    while True:
+        sequence.append(f'''tags,host={data_json['url']} tags="{data_json['tags']}"''')
+    except KeyError: pass
+    while 42:
         try:
             write_api.write(os.environ['INFLUXDB-BUCKET'], os.environ['INFLUXDB-ORG'], sequence)
         except Exception as e:
@@ -208,12 +190,11 @@ def format_to_json(write_api, db_con, status_code, timereq, url, retcode, messag
     data['message'] = message
     if tags != '':
         data['tags'] = tags
-    data_json = json.dumps(data)
     if write_api != None:
         insert_to_influxdb(write_api, db_con, data)
         return True
     else:
-        print(data_json)
+        print(data)
         return False
 
 

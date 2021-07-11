@@ -34,7 +34,7 @@ services:
     environment:
       - "INFLUXDB-HOST=http://db:8086"
       - LIST=/sources/list.yml
-      - INFLUXDB-TOKEN=VEOGVLkGuu-gQu9RPcPhOZCtsfYOIEOEQHuax-C6hMJwKoA0BXJmfvSlczEIxBvsCyHwmV2UuaNrdmK3azdaqw==
+      - INFLUXDB-TOKEN=HD0ahsAW5grFszjiwPQDV_BZbr8Idfto95lgvPKQUpSOn0KlQxYDMCsaHEeY2fhmi8G6W4LDA8LIorbkwH7YLg==
       - INFLUXDB-ORG=PG3
       - INFLUXDB-BUCKET=crawl-url
     networks:
