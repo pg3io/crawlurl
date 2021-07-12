@@ -214,14 +214,11 @@ def checkurl(q):
                 url_data.append([req, req.elapsed.total_seconds(), '', url[0], ""])
                 q.task_done()
         except Exception as e:
-            if e == requests.ReadTimeout:
-                if not flag:
-                    flag = True
-                else:
-                    url_data.append([None, 10.0, '', url[0], "10_second_time_out"])
-                    q.task_done()
+            if not flag:
+                flag = True
             else:
-                print(e)
+                url_data.append([None, 10.0, '', url[0], "10_second_time_out"])
+                q.task_done()
 
 
 def connect_to_influxdb():
