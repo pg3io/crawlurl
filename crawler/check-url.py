@@ -52,7 +52,7 @@ def main():
 
         try:
             file['delay']
-        except:
+        except KeyError:
             time.sleep(30)
         else:
             time.sleep(float(file['delay']))
@@ -143,7 +143,7 @@ def format_response(write_api, db_con, url, req, timereq, warning, danger, resul
             status_code = 0
             message = "ok"
     else:
-        print('PAIN & suffering')
+        print('An exception has been handled during crawling.')
         status_code = 2
         message = err_message
         retcode = "000"
@@ -166,7 +166,8 @@ def insert_to_influxdb(write_api, db_con, data_json):
     ]
     try:
         sequence.append(f'''tags,host={data_json['url']} tags="{data_json['tags']}"''')
-    except KeyError: pass
+    except KeyError:
+        pass
     while 42:
         try:
             write_api.write(os.environ['INFLUXDB-BUCKET'], os.environ['INFLUXDB-ORG'], sequence)
@@ -200,11 +201,8 @@ def format_to_json(write_api, db_con, status_code, timereq, url, retcode, messag
 
 
 def checkurl(q):
-    flag = False
     while True:
         url = q.get()
-        if flag:
-            url[0] = re.sub(r"\/[a-z0-9].", '/', url[0])
         try:
             if url[1] == True:
                 req = requests.get(url[0], timeout=10.0)
@@ -215,11 +213,9 @@ def checkurl(q):
                 url_data.append([req, req.elapsed.total_seconds(), '', url[0], ""])
                 q.task_done()
         except Exception as e:
-            if not flag:
-                flag = True
-            else:
-                url_data.append([None, 10.0, '', url[0], "10_second_time_out"])
-                q.task_done()
+            print(e)
+            url_data.append([None, 00.0, '', url[0], str(e)])
+            q.task_done()
 
 
 def connect_to_influxdb():
