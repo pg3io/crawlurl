@@ -143,6 +143,7 @@ def format_response(write_api, db_con, url, req, timereq, warning, danger, resul
             status_code = 0
             message = "ok"
     else:
+        print('PAIN & suffering')
         status_code = 2
         message = err_message
         retcode = "000"
@@ -175,7 +176,7 @@ def insert_to_influxdb(write_api, db_con, data_json):
             time.sleep(10)
         else:
             if not db_con:
-                print('Connected to  InfluxDB !')
+                print('Connected to InfluxDB !')
             break
     return True
 
