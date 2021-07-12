@@ -215,7 +215,11 @@ def checkurl(q):
                 q.task_done()
         except Exception as e:
             if e == requests.ReadTimeout:
-                flag = True
+                if not flag:
+                    flag = True
+                else:
+                    url_data.append([None, 10.0, '', url[0], "10_second_time_out"])
+                    q.task_done()
             else:
                 print(e)
 
