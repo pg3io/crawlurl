@@ -21,10 +21,14 @@ url_data = []
 def main():
     db_con = False
     global url_data
+    global file
     q = queue.Queue()
+    fQueue = queue.Queue()
     file = open_file()
     write_api = connect_to_influxdb()
-
+    fThread = Thread(target=refresh_file, args=(fQueue,))
+    fThread.daemon = True
+    fThread.start()
     try:
         file['thread']
     except:
@@ -39,6 +43,9 @@ def main():
             t.start()
 
     while 42:
+        if not fQueue.empty():
+            file = fQueue.get()
+            fQueue.task_done()
         urls = get_url_array(file)
         for url in urls:
                 q.put(url)
@@ -56,6 +63,18 @@ def main():
             time.sleep(30)
         else:
             time.sleep(float(file['delay']))
+
+
+def refresh_file(fQueue):
+    while 42:
+        file = open_file()
+        fQueue.put(file)
+        try:
+            refresh = file['refresh']
+        except KeyError:
+            time.sleep(30)
+        else: 
+            time.sleep(refresh)
 
 
 def fill_limit_data(file):

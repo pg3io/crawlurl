@@ -17,6 +17,9 @@ Le script peut etre utilisé pour logger les indices ou les transmettre à Influ
 * Toutes les autres variables d'environnement concernent la base de données et sont donc optionnelles.
 * Si la variable d'environnement INFLUXDB-HOST est définie et n'est pas vide, crawlurl fonctionnera avec Grafana
 
+Le fichier de configuration est rafraichi toutes les 30 secondes par défaut et une variable "refresh" dans ce dernier
+permet de définir cette période.
+
 ### sans InfluxDB (indices loggés dans le terminal)
 ```
 export LIST=${PWD}/list.yml

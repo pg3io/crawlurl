@@ -1,14 +1,632 @@
-delay: 5
-thread: 3
-website:  
-  - url: https://www.theverge.com
-    search: phonographEvents
-    warning: 0.3
+---
+delay: 30
+thread: 2
+website:
+#  - url: https://www.lourdes-france.org
+#    search: wpcf7
+#    warning: 2.0
+#    critical: 2.3
+#    ssl: true
+#    api: false
+#    tags:
+#      - prod
+#      - lourdes
 
-  - url: https://www.impots.gouv.fr/portail
-    search: mention-legales
+  - url: https://www.davidetmarcel.com
+    search: copyright
+    warning: 0.5
+    ssl: true
+    api: false
     tags:
-      - title
-      - gouv
+      - pg3
+
+  - url: https://club.twinresto.fr/#!/connexion
+    search: UA-99372517-1
+    ssl: true
+    tags:
+      - groupeavantages
+
+#  - url: https://www.leshotelsdenhaut.com/
+#    search: script.min.js
+#    warning: 0.3
+#    critical: 0.5
+#    ssl: true
+#    tags:
+#      - perseus
+
+  - url: https://partenaire-intermarche.geprocor.fr/fr/login
+    search: UA-116057600-1
+    warning: 0.3
+    critical: 0.6
+    ssl: true
+    tags:
+      - geprocor
+      - pix
+
+  - url: https://www.galimard.com/
+    search: </body>
+    warning: 0.7
+    critical: 0.9
+    ssl: true
+    tags:
+      - galimard
+      - pix
+
+  - url: https://pg3.io
+    search: UA-106088877-1
+    warning: 0.3
+    critical: 0.4
+    ssl: true
+    tags:
+      - prod
+      - pg3
+
+  - url: http://jenkins.len-medical.fr/login
+    search: Keep
+    ssl: false
+    tags:
+      - lenmedical
+
+  - url: https://www.lefive.com
+    search: Choisis
+    warning: 1.0
+    critical: 2.0
+    ssl: true
+    tags:
+      - playground
+      - lefive
+
+  - url: https://admin.lefive.us/#/login
+    search: runtime
+    warning: 1.8
+    critical: 2.0
+    ssl: true
+    tags:
+      - playground
+      - lefive
+
+  - url: https://api.lefive.us/soccer/v1/healthcheck
+    warning: 1.5
+    critical: 2.0
+    ssl: true
+    tags:
+      - playground
+      - lefive
+
+  - url: https://www.lefive.us/
+    search: UA-134623718-1
+    warning: 1.5
+    critical: 2.0
+    ssl: true
+    tags:
+      - lefiveus
+
+  - url: https://login.webmed.link
+    warning: 6.0
+    critical: 8.0
+    ssl: true
+    tags:
+      - prod
+      - lenmedical
+
+  - url: https://www.sagefemme-pratique.com
+    search: eu_cookie_compliance_cookie_name
+    warning: 6.0
+    critical: 8.0
+    ssl: true
+    tags:
+      - prod
+      - lenmedical
+
+  - url: https://www.cancerologie-pratique.com
+    search: eu_cookie_compliance_cookie_name
+    warning: 6.0
+    critical: 8.0
+    ssl: true
+    tags:
+      - prod
+      - lenmedical
+
+  - url: https://www.cardiologie-pratique.com
+    search: eu_cookie_compliance_cookie_name
+    warning: 6.0
+    critical: 8.0
+    ssl: true
+    tags:
+      - prod
+      - lenmedical
+
+  - url: https://www.dermatologie-pratique.com
+    search: eu_cookie_compliance_cookie_name
+    warning: 6.0
+    critical: 8.0
+    ssl: true
+    tags:
+      - prod
+      - lenmedical
+
+  - url: https://www.diabetologie-pratique.com
+    search: eu_cookie_compliance_cookie_name
+    warning: 6.0
+    critical: 8.0
+    ssl: true
+    tags:
+      - prod
+      - lenmedical
+
+  - url: https://www.e-direct.tv
+    search: modal_focus_input
+    warning: 6.0
+    critical: 8.0
+    ssl: true
+    tags:
+      - prod
+      - lenmedical
+
+  - url: https://www.gynecologie-pratique.com
+    search: eu_cookie_compliance_cookie_name
+    warning: 6.0
+    critical: 8.0
+    ssl: true
+    tags:
+      - prod
+      - lenmedical
+
+  - url: https://www.jiff.fr
+    search: eu_cookie_compliance_cookie_name
+    warning: 6.0
+    critical: 8.0
+    ssl: true
+    tags:
+      - prod
+      - lenmedical
+
+  - url: https://www.neurologie-pratique.com
+    search: eu_cookie_compliance_cookie_name
+    warning: 6.0
+    critical: 8.0
+    ssl: true
+    tags:
+      - prod
+      - lenmedical
+
+  - url: https://www.opa-pratique.com
+    search: eu_cookie_compliance_cookie_name
+    warning: 6.0
+    critical: 8.0
+    ssl: true
+    tags:
+      - prod
+      - lenmedical
+
+  - url: https://www.pediatrie-pratique.com
+    search: eu_cookie_compliance_cookie_name
+    warning: 6.0
+    critical: 8.0
+    ssl: true
+    tags:
+      - prod
+      - lenmedical
+
+  - url: https://www.revue-vision.com
+    search: eu_cookie_compliance_cookie_name
+    warning: 6.0
+    critical: 8.0
+    ssl: true
+    tags:
+      - prod
+      - lenmedical
+
+  - url: https://www.neurologie-pratique.com
+    search: eu_cookie_compliance_cookie_name
+    warning: 6.0
+    critical: 8.0
+    ssl: true
+    tags:
+      - prod
+      - lenmedical
+
+  - url: https://www.biot.fr
+    search: UA-16884805-1
+    warning: 1.5
+    critical: 1.7
+    ssl: true
+    tags:
+      - prod
+      - biot
+
+  - url: https://www.4padel.fr
+    search: Tarifs 4PADEL
+    warning: 0.5
+    critical: 1.0
+    ssl: true
+    tags:
+      - prod
+      - playground
+
+  - url: https://api.lefive.fr/splf/v1/healthcheck
+    warning: 0.4
+    critical: 0.5
+    ssl: true
+    api: true
+    tags:
+      - prod
+      - lefive
+      - playground
+
+  - url: https://api.zidanefiveclub.com/splf/v1/healthcheck
+    warning: 0.4
+    critical: 0.5
+    ssl: true
+    api: true
+    tags:
+      - prod
+      - lefive
+      - playground
+
+  - url: https://www.oceano.org
+    search: GTM-KK6TB56
+    warning: 1.0
+    critical: 1.5
+    ssl: true
+    api: false
+    tags:
+      - prod
+      - oceano
+      - pix
+
+  - url: https://musee.oceano.org/
+    search: GTM-T386LZZ
+    warning: 0.7
+    critical: 1.0
+    ssl: true
+    api: false
+    tags:
+      - prod
+      - oceano
+      - pix
+
+  - url: https://maison.oceano.org/
+    search: GTM-MJ2F7DB
+    warning: 0.6
+    critical: 1.0
+    ssl: true
+    api: false
+    tags:
+      - prod
+      - oceano
+      - pix
+
+  - url: https://api.z5sport.com/splf/v1/healthcheck
+    warning: 0.5
+    critical: 0.7
+    ssl: true
+    api: true
+    tags:
+      - prod
+      - playground
+      - z5
+
+  - url: https://www.lefive.fr
+    search: </body>
+    warning: 1.7
+    critical: 2.0
+    ssl: true
+    api: true
+    tags:
+      - prod
+      - lefive
+      - playground
+
+#  - url: https://cms-api.z5sport.com/server/ping
+#    search: pong
+#    warning: 1.0
+#    critical: 1.2
+#    ssl: true
+#    tags:
+#      - prod
+#      - playground
+#      - z5
+
+  - url: https://www.swnsa.fr
+    search: nectarLove
+    warning: 1.0
+    critical: 1.5
+    ssl: true
+    api: false
+    tags:
+      - prod
+      - swnsa
+
+  - url: https://onsevoitquand.events/
+    warning: 4.0
+    critical: 5.0
+    search: jquery
+    ssl: true
+    tags:
+      - prod
+
+  - url: https://www.arbevel.com/fr
+    warning: 0.5
+    critical: 0.6
+    search: </body> 
+    ssl: true
+    tags:
+      - prod
+      - pix
+
+#  - url: https://www.groupeavantages.com
+#    ssl: true
+
+  - url: https://www.zonerevolution.com
+    ssl: true
+    search: adyen
+    warning: 0.5
+    critical: 1.0
+    tags:
+      - prod
+
+  - url: https://www.miss-ko.com/
+    ssl: true
+    tags:
+      - prod
+      - pix
+
+  - url: https://www.ruffetassocies.fr/
+    ssl: true
+    search: </body>
+    warning: 0.6
+    critical: 0.8
+    tags:
+      - prod
+
+#  - url: https://articles.len-medical.fr/
+#    ssl: true
+#    tags:
+#      - prod
+#      - lenmedical 
+
+  - url: https://www.barsolutions.fr/fr/
+    warning: 0.7
+    critical: 0.9
+    ssl: true
+    tags:
+      - prod
+      - barsolutions
+
+#  - url: https://nessia.diocese-nice.fr/server/ping
+#    search: pong
+#    ssl: true
+#    tags:
+#      - prod
+#      - nessia
+
+#  - url: https://api.yakila.com/health
+#    ssl: true
+#    warning: 1.0
+#    critical: 1.4
+#    tags:
+#      - prod
+#      - yakila
+#
+#  - url: https://api.yakila-rec.xyz/health
+#    warning: 1.0
+#    critical: 1.4
+#    ssl: true
+#    tags:
+#      - preprod
+#      - yakila
+#
+#  - url: https://api-em.yakila.com/api/health
+#    warning: 1.0
+#    critical: 1.4
+#    ssl: true
+#    tags:
+#      - prod
+#      - yakila
+#
+#  - url: https://eventmanager-api.yakila-rec.xyz/api/health
+#    ssl: true
+#    warning: 1.0
+#    critical: 1.4
+#    tags:
+#      - preprod
+#      - yakila
+
+  - url: https://admin.lefive.fr/
+    ssl: true
+    warning: 0.4
+    critical: 0.6
+    search: preloader
+    tags:
+      - lefive
+
+  - url: https://admin.z5sport.com/
+    ssl: true
+    warning: 0.4
+    critical: 0.6
+    search: preloader
+    tags:
+      - lefive
+
+  - url: https://admin.zonerevolution.fr/
+    ssl: true
+    warning: 0.4
+    critical: 0.6
+    search: preloader
+    tags:
+      - lefive
+
+  - url: https://crm.conceptpatrimoine.fr
+    ssl: true
+    search: defer
+    tags:
+     - pix
+
+  - url: https://www.sophia-antipolis.fr
+    ssl: true
+    warning: 0.4
+    critical: 0.6
+    search: wprediscache
+    tags:
+     - pix
+
+  - url: https://www.nicestartsup.com/
+    ssl: true
+    warning: 0.8
+    critical: 1.0
+    search: wpgmp_not_working
+
+  - url: https://webphone.ibridgepeople.fr/connect
+    ssl: true
+    tags:
+     - ibp
+
+
+  - url: https://webphone7.ibridgepeople.fr/connect
+    ssl: true
+    tags:
+     - ibp
+
+  - url: https://webphone8.ibridgepeople.fr/connect
+    ssl: true
+    tags:
+     - ibp
+
+  - url: https://webphone9.ibridgepeople.fr/connect
+    ssl: true
+    tags:
+     - ibp
+
+  - url: https://webphone10.ibridgepeople.fr/connect
+    ssl: true
+    tags:
+     - ibp
+
+  - url: https://webphone12.ibridgepeople.fr/connect
+    ssl: true
+    tags:
+     - ibp
+
+#  - url: https://stg-check.meeting.ibridgepeople.net
+#    ssl: true
+#    tags:
+#     - ibp
+
+
+  - url: https://www.eneomey.com/fr/ 
+    ssl: true
+    search: viewport
+    warning: 1.4
+    critical: 2.0
+    tags:
+     - pk3
+
+  - url: https://boutique.gustofamily.com
+    ssl: true
+    search: </body>
+    warning: 0.8
+    critical: 1.0
+    tags:
+     - gustofamily
 
   - url: https://www.woash.com
+    ssl: true
+    search: </body>
+    warning: 10.0
+    critical: 15.0
+    tags:
+     - woash
+
+  - url: https://www.vhyg.com
+    ssl: true
+    search: </body>
+    warning: 5.0
+    critical: 6.0
+    tags:
+     - vhyg 
+
+  - url: http://kenpo-france.com/
+    search: </body> 
+    warning: 0.9
+    critical: 1.6
+    tags:
+     - pix
+
+  - url: https://cf2m.montjoye.org/ 
+    search: </body> 
+    warning: 1.4
+    critical: 1.6
+    tags:
+     - pix
+
+#  - url: https://www.unic-sa.com/fr 
+#    search: </body> 
+#    warning: 0.4
+#    critical: 0.6
+#    tags:
+#     - pix
+
+  - url: http://www.berniaud-avocats.com/ 
+    warning: 0.9
+    critical: 1.6
+    search: </body> 
+    tags:
+     - pix
+
+  - url: http://www.sfcr.fr
+    warning: 0.6
+    critical: 0.8
+    search: </body> 
+    tags:
+     - pix
+
+  - url: https://www.bisou.com/fr
+    search: </body> 
+    warning: 0.4
+    critical: 0.6
+    tags:
+     - pix
+
+  - url: http://www.clubpresse06.com 
+    search: </body> 
+    warning: 1.4
+    critical: 1.8
+    tags:
+     - pix
+
+  - url: https://www.conceptpatrimoine.fr/ 
+    search: </body> 
+    warning: 1.0
+    critical: 1.4
+    tags:
+     - pix
+
+  - url: http://www.eurimpex-mdd.com/ 
+    search: </body> 
+    warning: 1.6
+    critical: 1.8
+    tags:
+     - pix
+
+#  - url: https://lesturbulentes.fr/fr 
+#    search: </body> 
+#    warning: 0.6
+#    critical: 0.8
+#    tags:
+#     - pix
+
+  - url: http://www.lipowheat.com/ 
+    search: </body> 
+    warning: 0.9
+    critical: 1.3
+    tags:
+     - pix
+
+  - url: https://www.algora-environnement.fr/
+    ssl: true
+    search: </body> 
+    warning: 0.7
+    critical: 1.0
+    tags:
+     - pix
