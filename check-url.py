@@ -23,12 +23,8 @@ def main():
     global url_data
     global file
     q = queue.Queue()
-    fQueue = queue.Queue()
     file = open_file()
     write_api = connect_to_influxdb()
-    fThread = Thread(target=refresh_file, args=(fQueue,))
-    fThread.daemon = True
-    fThread.start()
     try:
         file['thread']
     except:
@@ -43,9 +39,7 @@ def main():
             t.start()
 
     while 42:
-        if not fQueue.empty():
-            file = fQueue.get()
-            fQueue.task_done()
+        file = open_file()
         urls = get_url_array(file)
         for url in urls:
                 q.put(url)
