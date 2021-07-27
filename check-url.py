@@ -39,7 +39,10 @@ def main():
             t.start()
 
     while 42:
-        file = open_file()
+        tmp_file = open_file()
+        if file != tmp_file:
+            file = tmp_file
+            print('File has changed : reloading...')
         urls = get_url_array(file)
         for url in urls:
                 q.put(url)
