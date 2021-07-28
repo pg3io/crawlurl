@@ -43,10 +43,12 @@ def main():
             t.start()
 
     while 42:
-        file = open_file()
         if not fQueue.empty():
-            file = fQueue.get()
+            tmp_file = fQueue.get()
             fQueue.task_done()
+            if tmp_file != file:
+                file = tmp_file
+                print('File changed, reloading.')
         urls = get_url_array(file)
         for url in urls:
                 q.put(url)
@@ -59,11 +61,11 @@ def main():
         url_data.clear()
 
         try:
-            file['delay']
+            delay = file['delay']
         except KeyError:
             time.sleep(30)
         else:
-            time.sleep(float(file['delay']))
+            time.sleep(float(delay))
 
 
 def refresh_file(fQueue):
