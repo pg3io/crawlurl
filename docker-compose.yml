@@ -1,15 +1,54 @@
 version: '3.3'
 
 services:
-  web:
-    image: registry.pg3.io:5000/pg3io/crawl:${VERSION:-latest}
+  db:
+    image: influxdb:2.0
+    ports:
+      - '8086:8086'
     volumes:
-      - ./sources/list.yml:/sources/
+      - ./influxdbv2:/root/.influxdbv2
+    networks:
+      - app-to-db
+      - db-to-grafana
+    
+
+  grafana:
+    image: grafana/grafana
+    ports:
+      - '3000:3000'
+    volumes:
+      - './grafana:/var/lib/grafana'
+    networks:
+      - db-to-grafana
+    depends_on:
+      - db
+
+  influxdb_cli:
+    image: quay.io/influxdb/influxdb:v2.0.3
+    entrypoint: influx setup --bucket crawl-url -t IyxHCtOAH68QF8qTVAY2Jge-u3CdcINp5nsIK0Eme0cb4GeYqtADvrS3SYQaOgkccMdACvQpHxvbPowMhzr53g== -o PG3 --username=pg3 --password=password --host=http://db:8086 -f
+    restart: on-failure:10
+    depends_on:
+      - db
+    networks:
+      - app-to-db
+  
+  web:
+    depends_on:
+      - db
+    restart: on-failure:10
+    build: .
+    volumes:
+      - ./sources/:/sources
     environment:
-      - "LIST=/sources/list.yml"
-    # logging into logstash
-    logging:
-      driver: gelf
-      options:
-        gelf-address: udp://127.0.0.1:12201
-        tag: crawl.status
+      - "INFLUXDB-HOST=http://db:8086"
+      - LIST=/sources/list.yml
+      - INFLUXDB-TOKEN=IyxHCtOAH68QF8qTVAY2Jge-u3CdcINp5nsIK0Eme0cb4GeYqtADvrS3SYQaOgkccMdACvQpHxvbPowMhzr53g==
+      - INFLUXDB-ORG=PG3
+      - INFLUXDB-BUCKET=crawl-url
+    networks:
+      - app-to-db
+
+networks:
+  app-to-db:
+  db-to-grafana:
+
