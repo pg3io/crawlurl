@@ -236,7 +236,10 @@ def checkurl(q):
                 q.task_done()
         except Exception as e:
             print(e)
-            url_data.append([None, 00.0, '', url[0], str(e)])
+            if (e.__class__ == requests.exceptions.SSLError):
+                url_data.append([None, 00.0, '', url[0], 'ssl_cert_expired_or_invalid'])
+            else:
+                url_data.append([None, 00.0, '', url[0], e.__class__.__name__])
             q.task_done()
 
 
