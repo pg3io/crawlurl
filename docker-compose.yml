@@ -1,0 +1,25 @@
+version: '3.6'
+
+services:
+  web:
+    build: . 
+    volumes:
+      - ./sources/:/sources/
+    environment:
+      - "LIST=/sources/list.yml"
+      - "INFLUXDB-HOST=http://influxdb:8086"
+      - "INFLUXDB-BUCKET=crawl"
+      - "INFLUXDB-TOKEN=Feixa4iePhaeyahji9Eech6ahphaidituy7eeb3TahF6weengo"
+      - "INFLUXDB-ORG=test"
+
+  influxdb:
+    image: influxdb:2.7
+    ports:
+      - "8086:8086"
+    environment: 
+      - DOCKER_INFLUXDB_INIT_MODE=setup
+      - DOCKER_INFLUXDB_INIT_USERNAME=admin
+      - DOCKER_INFLUXDB_INIT_PASSWORD=passwordpasswordpassword
+      - DOCKER_INFLUXDB_INIT_ADMIN_TOKEN=Feixa4iePhaeyahji9Eech6ahphaidituy7eeb3TahF6weengo
+      - DOCKER_INFLUXDB_INIT_ORG=test
+      - DOCKER_INFLUXDB_INIT_BUCKET=crawl

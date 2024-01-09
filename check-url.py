@@ -178,7 +178,7 @@ def open_file():
 
 def insert_to_influxdb(write_api, db_con, data_json):
     sequence = [
-        f'''server_response,host={data_json['url']} status_code={data_json['status_code']},timereq={data_json['timereq']},retcode={data_json['retcode']},message="{data_json['message']}"'''
+        f'''server_response,host={data_json['url']} status_code={data_json['status_code']},timereq={data_json['timereq']},retcode={data_json['retcode']},message="{data_json['message']}",tag="{data_json['tag']}"'''
     ]
     try:
         sequence.append(f'''tags,host={data_json['url']} tags="{data_json['tags']}"''')
@@ -208,6 +208,7 @@ def format_to_json(write_api, db_con, status_code, timereq, url, retcode, messag
     data['message'] = message
     if tags != '':
         data['tags'] = tags
+        data['tag'] = tags[0]
     if write_api != None:
         insert_to_influxdb(write_api, db_con, data)
         return True
