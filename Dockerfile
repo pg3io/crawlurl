@@ -1,13 +1,14 @@
-FROM python:2.7.15-alpine
+FROM python:3.9-alpine
 
 WORKDIR /usr/src/app
 COPY requirements.txt ./
 RUN pip install --no-cache-dir -r requirements.txt
 
 COPY  check-url.py /usr/src/app/main.py
-RUN mkdir /sources && touch /sources/list.txt
+RUN mkdir /sources
 
+COPY sources/list.yml /sources/list.txt
 ENV LIST="/sources/list.txt"
-VOLUME ['/sources/']
+VOLUME ["/sources/"]
 
-CMD [ "python2", "-u", "main.py" ]
+CMD [ "python3", "-u", "main.py" ]

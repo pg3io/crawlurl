@@ -1,14 +1,23 @@
+---
 delay: 30
 thread: 2
 website:
   - url: https://www.journaldugeek.com/
+    tag: test 
+    tags:
+      - jdg 
+      - test 
 
   - url: https://www.theverge.com
     search: phonographEvents
     warning: 0.3
     critical: 0.4
+    tag: coucou
+    tags:
+      - ok
 
   - url: https://www.impots.gouv.fr/portail/
-    search: mention-legales
+    search: muention-legales
     tags:
       - gouv
+      - test

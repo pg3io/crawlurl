@@ -1,15 +1,25 @@
-version: '3.3'
+version: '3.6'
 
 services:
   web:
-    image: registry.pg3.io:5000/pg3io/crawl:${VERSION:-latest}
+    build: . 
     volumes:
-      - ./sources/list.yml:/sources/
+      - ./sources/:/sources/
     environment:
       - "LIST=/sources/list.yml"
-    # logging into logstash
-    logging:
-      driver: gelf
-      options:
-        gelf-address: udp://127.0.0.1:12201
-        tag: crawl.status
+      - "INFLUXDB-HOST=http://influxdb:8086"
+      - "INFLUXDB-BUCKET=crawl"
+      - "INFLUXDB-TOKEN=Feixa4iePhaeyahji9Eech6ahphaidituy7eeb3TahF6weengo"
+      - "INFLUXDB-ORG=test"
+
+  influxdb:
+    image: influxdb:2.7
+    ports:
+      - "8086:8086"
+    environment: 
+      - DOCKER_INFLUXDB_INIT_MODE=setup
+      - DOCKER_INFLUXDB_INIT_USERNAME=admin
+      - DOCKER_INFLUXDB_INIT_PASSWORD=passwordpasswordpassword
+      - DOCKER_INFLUXDB_INIT_ADMIN_TOKEN=Feixa4iePhaeyahji9Eech6ahphaidituy7eeb3TahF6weengo
+      - DOCKER_INFLUXDB_INIT_ORG=test
+      - DOCKER_INFLUXDB_INIT_BUCKET=crawl
