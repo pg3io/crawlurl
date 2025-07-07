@@ -222,11 +222,11 @@ def checkurl(q):
         url = q.get()
         try:
             if url[1] == True:
-                req = requests.get(url[0], timeout=10.0)
+                req = requests.get(url[0], timeout=(10, 30))
                 url_data.append([req, req.elapsed.total_seconds(), '', url[0], ""])
                 q.task_done()
             else:
-                req = requests.head(url[0], timeout=10.0)
+                req = requests.head(url[0], timeout=(10, 30))
                 url_data.append([req, req.elapsed.total_seconds(), '', url[0], ""])
                 q.task_done()
         except Exception as e:
