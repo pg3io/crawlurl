@@ -27,17 +27,20 @@ python check-url.py
 ```
 ### avec InfluxDB
 ```
-export "LIST=${PWD}/list.yml"
+export "LIST=${PWD}/sources/list.yml"
 export "INFLUXDB-HOST=http://localhost:8086"
-export "INFLUXDB-BUCKET=bucket"
-export "INFLUXDB-TOKEN=token"
-export "INFLUXDB-ORG=org"
+export "INFLUXDB-BUCKET=crawl"
+export "INFLUXDB-TOKEN=<TOKEN_SECRET_INFLUXDB>"
+export "INFLUXDB-ORG=<ORGANISATION>"
 python check-url.py
 ```
 
 ### Docker
+
+:warning: Modifier les variables  d'environnement dans le docker-compose.yml
+
 ```
-docker-compose build --no-cache && docker-compose up -d
+docker compose build --no-cache && docker compose up -d
 ```
 
 ## Fonctionnalitées futures
@@ -57,4 +60,3 @@ Ce projet est sous licence [Apache 2.0](https://www.apache.org/licenses/LICENSE-
 
 # Informations sur l'auteur
 Ce projet a été créé par [PG3](https://pg3.io) en décembre 2018.
-Ce projet a été maintenu par [PG3](https://pg3.io) en juillet 2021.
