@@ -1,12 +1,11 @@
 #!/usr/bin/python
 import os
 import time
-import re
 from threading import Thread
 import queue
 import yaml
 import requests
-
+import sys
 from influxdb_client import InfluxDBClient
 from influxdb_client.client.write_api import SYNCHRONOUS
 
@@ -14,117 +13,89 @@ try:
     filesource = os.environ['LIST']
 except KeyError:
     print('Missing LIST environnement variable, exiting.')
-    exit(1)
+    sys.exit(1)
 
 url_data = []
 
 def main():
     db_con = False
     global url_data
-    global file
+    global config
     q = queue.Queue()
-    file = open_file()
+    config = parse_config()
     write_api = connect_to_influxdb()
-    try:
-        file['thread']
-    except:
-        for i in range(int(1)):
+    if 'thread' in config:
+        for i in range(int(config['thread'])):
             t = Thread(target=checkurl, args=(q,))
             t.daemon = True
             t.start()
     else:
-        for i in range(int(file['thread'])):
+        for i in range(int(1)):
             t = Thread(target=checkurl, args=(q,))
             t.daemon = True
             t.start()
 
     while 42:
-        tmp_file = open_file()
-        if file != tmp_file:
-            file = tmp_file
-            print('File has changed : reloading...')
-        urls = get_url_array(file)
+        tmp_config = parse_config()
+        if config != tmp_config:
+            config = tmp_config
+            print('config has changed : reloading...')
+        urls = get_url_array(config)
         for url in urls:
                 q.put(url)
         q.join()
 
-        fill_limit_data(file)
+        fill_limit_data(config)
         for data in url_data:
             db_con = format_response(write_api, db_con, data[3], data[0], data[1], data[6], data[7], data[5], data[4], data[8])
         
         url_data.clear()
 
-        try:
-            file['delay']
-        except KeyError:
-            time.sleep(30)
+        if 'delay' in config:
+            time.sleep(float(config['delay']))
         else:
-            time.sleep(float(file['delay']))
-
-
-def refresh_file(fQueue):
-    while 42:
-        file = open_file()
-        fQueue.put(file)
-        try:
-            refresh = file['refresh']
-        except KeyError:
             time.sleep(30)
-        else: 
-            time.sleep(refresh)
 
 
-def fill_limit_data(file):
-    for line in file['website']:
+def fill_limit_data(config):
+    for site in config['website']:
         for data in url_data:
-            if line['url'] == data[3]:
-                try:
-                    line['search']
-                except:
-                    data.append('')
+            if site['url'] == data[3]:
+                if 'search' in site:
+                    data.append(site['search'])
                 else:
-                    data.append(line['search'])
-
-                try:
-                    line['warning']
-                except:
+                    data.append('')
+                
+                if 'warning' in site:
+                    data.append(site['warning'])
+                else:
                     data.append(0.2)
+                    
+                if 'critical' in site:
+                    data.append(site['critical'])
                 else:
-                    data.append(line['warning'])
-
-                try:
-                    line['critical']
-                except:
                     data.append(0.3)
-                else:
-                    data.append(line['critical'])
 
-                try:
-                    line['tags']
-                except:
+                if 'tags' in site:
+                    data.append(site['tags'])
+                else:
                     data.append('')
-                else:
-                    data.append(line['tags'])
 
-                try:
-                    line['api']
-                except:
+                if 'api' in site:
+                    data.append(site['api'])
+                else:
                     data.append('')
-                else:
-                    data.append(line['api'])
 
 
 
-def get_url_array(file):
+def get_url_array(config):
     urls = []
 
-    for url in file['website']:
-        try:
-            url['search']
-        except:
-            urls.append([url['url'], False])
-        else:
+    for url in config['website']:
+        if 'search' in url:
             urls.append([url['url'], True])
+        else:
+            urls.append([url['url'], False])
 
     return urls
 
@@ -167,13 +138,14 @@ def format_response(write_api, db_con, url, req, timereq, warning, danger, resul
     return (format_to_json(write_api, db_con, status_code, timereq, url, retcode, message, tags))
 
 
-def open_file():
+def parse_config() -> dict:
+    config = {}
     with open(filesource, 'r') as stream:
         try:
-            file = yaml.load(stream, Loader=yaml.FullLoader)
+            config = yaml.load(stream, Loader=yaml.FullLoader)
         except yaml.YAMLError as exc:
             print(exc)
-    return file
+    return config
 
 
 def insert_to_influxdb(write_api, db_con, data_json):
@@ -264,4 +236,4 @@ if __name__ == '__main__':
         try:
             main()
         except KeyboardInterrupt:
-            exit(1)
+            sys.exit(1)
