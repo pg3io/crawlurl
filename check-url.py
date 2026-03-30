@@ -119,12 +119,28 @@ def get_url_array(file):
     urls = []
 
     for url in file['website']:
+        has_search = False
+        headers_dict = {}
+
         try:
             url['search']
         except:
-            urls.append([url['url'], False])
+            has_search = False
         else:
-            urls.append([url['url'], True])
+            has_search = True
+
+        try:
+            url['headers']
+        except:
+            headers_dict = {}
+        else:
+            # Parse headers from list format ["key:value", "key2:value2"]
+            for header in url['headers']:
+                if ':' in header:
+                    key, value = header.split(':', 1)
+                    headers_dict[key.strip()] = value.strip()
+
+        urls.append([url['url'], has_search, headers_dict])
 
     return urls
 
@@ -220,18 +236,23 @@ def format_to_json(write_api, db_con, status_code, timereq, url, retcode, messag
 def checkurl(q):
     while True:
         url = q.get()
+        headers = url[2] if len(url) > 2 else {}
         try:
             if url[1] == True:
-                req = requests.get(url[0], timeout=(10, 30))
+                req = requests.get(url[0], headers=headers, timeout=(10, 30))
                 url_data.append([req, req.elapsed.total_seconds(), '', url[0], ""])
                 q.task_done()
             else:
-                req = requests.head(url[0], timeout=(10, 30))
+                req = requests.head(url[0], headers=headers, timeout=(10, 30))
                 url_data.append([req, req.elapsed.total_seconds(), '', url[0], ""])
                 q.task_done()
+        except requests.exceptions.SSLError:
+            print('SSL Error')
+            url_data.append([None, 00.0, '', url[0], 'ssl_cert_expired_or_invalid'])
+            q.task_done()
         except Exception as e:
             print(e)
-            url_data.append([None, 00.0, '', url[0], str(e)])
+            url_data.append([None, 00.0, '', url[0], type(e).__name__])
             q.task_done()
 
 
