@@ -2,6 +2,7 @@
 import os
 import time
 import re
+import json
 from threading import Thread
 import queue
 import yaml
@@ -121,6 +122,7 @@ def get_url_array(file):
     for url in file['website']:
         has_search = False
         headers_dict = {}
+        is_healthcheck = False
 
         try:
             url['search']
@@ -140,7 +142,14 @@ def get_url_array(file):
                     key, value = header.split(':', 1)
                     headers_dict[key.strip()] = value.strip()
 
-        urls.append([url['url'], has_search, headers_dict])
+        try:
+            url['healthcheck']
+        except:
+            is_healthcheck = False
+        else:
+            is_healthcheck = url['healthcheck']
+
+        urls.append([url['url'], has_search, headers_dict, is_healthcheck])
 
     return urls
 
@@ -233,14 +242,42 @@ def format_to_json(write_api, db_con, status_code, timereq, url, retcode, messag
         return False
 
 
+def check_healthcheck_json(response_text):
+    """
+    Parse JSON healthcheck and return error message if any service is 'ko'
+    Returns empty string if all services are 'ok' or if parsing fails
+    """
+    try:
+        data = json.loads(response_text)
+        ko_services = []
+
+        def check_services(obj, prefix=''):
+            if isinstance(obj, dict):
+                for key, value in obj.items():
+                    if isinstance(value, str) and value.lower() == 'ko':
+                        ko_services.append(f"{prefix}{key}" if prefix == '' else f"{prefix}.{key}")
+                    elif isinstance(value, dict):
+                        check_services(value, f"{prefix}.{key}" if prefix else key)
+
+        check_services(data)
+
+        if ko_services:
+            return f"healthcheck_failed:_{','.join(ko_services)}"
+        return ''
+    except:
+        return ''
+
+
 def checkurl(q):
     while True:
         url = q.get()
         headers = url[2] if len(url) > 2 else {}
+        is_healthcheck = url[3] if len(url) > 3 else False
         try:
             if url[1] == True:
                 req = requests.get(url[0], headers=headers, timeout=(10, 30))
-                url_data.append([req, req.elapsed.total_seconds(), '', url[0], ""])
+                healthcheck_error = check_healthcheck_json(req.text) if is_healthcheck else ''
+                url_data.append([req, req.elapsed.total_seconds(), '', url[0], healthcheck_error])
                 q.task_done()
             else:
                 req = requests.head(url[0], headers=headers, timeout=(10, 30))
