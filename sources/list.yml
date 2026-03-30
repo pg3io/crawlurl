@@ -3,10 +3,10 @@ delay: 30
 thread: 2
 website:
   - url: https://www.journaldugeek.com/
-    tag: test 
+    tag: test
     tags:
-      - jdg 
-      - test 
+      - jdg
+      - test
 
   - url: https://www.theverge.com
     search: phonographEvents
@@ -21,3 +21,21 @@ website:
     tags:
       - gouv
       - test
+
+  # Example with custom headers
+  - url: https://api.example.com/status
+    headers:
+      - "Authorization: Bearer token123"
+      - "X-Custom-Header: value"
+    tags:
+      - api
+      - custom-headers
+
+  # Example with healthcheck (checks for 'ko' in JSON response)
+  - url: https://api.example.com/healthcheck
+    healthcheck: true
+    headers:
+      - "X-Auth-Token: supervision"
+    tags:
+      - healthcheck
+      - api
